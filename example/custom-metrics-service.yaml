@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gardener-custom-metrics
+  namespace: garden
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 6443
+  publishNotReadyAddresses: true
+  selector:
+    app: gardener-custom-metrics
+    gardener.cloud/role: gardener-custom-metrics
+    resources.gardener.cloud/managed-by-xxx: gardener
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

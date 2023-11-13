@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2021 SAP SE or an SAP affiliate company and Gardener contributors
+#
+# SPDX-License-Identifier: Apache-2.0
+
+gardener-custom-metrics:
+  template: 'default'
+  base_definition:
+    repo: ~
+    traits:
+      version:
+        preprocess: 'inject-commit-hash'
+      publish:
+        oci-builder: docker-buildx
+        platforms:
+        - linux/amd64
+        - linux/arm64
+        dockerimages:
+          gardener-custom-metrics:
+            registry: 'gcr-readwrite'
+            image: 'eu.gcr.io/sap-se-gcp-scp-k8s/gardener-custom-metrics' # 'eu.gcr.io/gardener-project/gardener/gardener-custom-metrics'
+            dockerfile: 'Dockerfile'
+            target: gardener-custom-metrics
+  jobs:
+    head-update:
+      traits:
+        component_descriptor: ~
+        draft_release: ~
+        options:
+          public_build_logs: true
+    pull-request:
+      traits:
+        pull-request: ~
+        component_descriptor: ~
+        options:
+          public_build_logs: true
+    release:
+      steps:
+        verify:
+          image: 'golang:1.19.9'
+      traits:
+        version:
+          preprocess: 'finalize'
+        release:
+          nextversion: 'bump_minor'
+          next_version_callback: '.ci/prepare_release'
+          release_callback: '.ci/prepare_release'
+#        slack:
+#          default_channel: 'internal_scp_workspace'
+#          channel_cfgs:
+#            internal_scp_workspace:
+#              channel_name: 'C9CEBQPGE' #sap-tech-gardener
+#              slack_cfg_name: 'scp_workspace'
+        component_descriptor: ~
+        publish:
+          dockerimages:
+            gardener-custom-metrics:
+              tag_as_latest: true
