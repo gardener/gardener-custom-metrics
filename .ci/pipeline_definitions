@@ -17,7 +17,7 @@ gardener-custom-metrics:
         dockerimages:
           gardener-custom-metrics:
             registry: 'gcr-readwrite'
-            image: 'eu.gcr.io/sap-se-gcp-scp-k8s/gardener-custom-metrics' # 'eu.gcr.io/gardener-project/gardener/gardener-custom-metrics'
+            image: 'eu.gcr.io/sap-se-gcp-scp-k8s/gardener/gardener-custom-metrics' # 'eu.gcr.io/gardener-project/gardener/gardener-custom-metrics'
             dockerfile: 'Dockerfile'
             target: gardener-custom-metrics
   jobs:
