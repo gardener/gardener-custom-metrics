@@ -1,15 +1,12 @@
-# <repo name>
-
+# gardener-custom-metrics
 [![reuse compliant](https://reuse.software/badge/reuse-compliant.svg)](https://reuse.software/)
+## Overview
+The `gardener-custom-metrics` component operates as a K8s API service, adding functionality to the seed kube-apiserver.
+It periodically scrapes the metrics endpoints of all shoot kube-apiserver pods on the seed. It implements the K8s custom
+metrics API and provides K8s metrics specific to Gardener, based on custom calculations.
+
 
 ## How to use this repository template
-
-This template repository can be used to seed new git repositories in the gardener github organisation.
-
-- you need to be a [member of the gardener organisation](https://github.com/orgs/gardener/people)
-  in order to be able to create a new private repository
-- [create the new repository](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
-  based on this template repository
 - in the files
   - `.reuse/dep5`
   - `CODEOWNERS`
@@ -21,9 +18,6 @@ This template repository can be used to seed new git repositories in the gardene
     If several repositories share a common topic and the same
     set of maintainers they can share a common maintainer team
 - set the repository description in the "About" section of your repository
-- describe the new component in additional sections in this `README.md`
-- any contributions to the new repository must follow the rules in the 
-  [contributor guide](https://github.com/gardener/documentation/blob/master/CONTRIBUTING.md)
 - remove this section from this `README.md`
 - ask [@msohn](https://github.com/orgs/gardener/people/msohn) or another
   [owner of the gardener github organisation](https://github.com/orgs/gardener/people?query=role%3Aowner)
