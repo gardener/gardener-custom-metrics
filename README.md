@@ -1,16 +1,6 @@
-pkg directory:
-```
-├── input - Takes care of source data: tracks seed's k8s contents, scrapes ShootKapis
-│   ├── controller
-│   │   ├── ...
-│   │   ├── pod
-│   │   │   └── ...
-│   │   └── secret
-│   │       └── ...
-│   ├── input_data_registry - Repository for the metrics source data
-│   │   └── input_data_registry.go
-│   └── input_data_service.go - Primary responsible for providing input data
-└── metrics_provider_service - Serves k8s metrics via HTTP
-    ├── metrics_provider.go - Implements the provider interface required by the metrics server library
-    └── metrics_provider_service.go - Primary responsible for serving K8s metrics
-```
+# gardener-custom-metrics
+[![reuse compliant](https://reuse.software/badge/reuse-compliant.svg)](https://reuse.software/)
+## Overview
+The `gardener-custom-metrics` component operates as a K8s API service, adding functionality to the seed kube-apiserver.
+It periodically scrapes the metrics endpoints of all shoot kube-apiserver pods on the seed. It implements the K8s custom
+metrics API and provides K8s metrics specific to Gardener, based on custom calculations.

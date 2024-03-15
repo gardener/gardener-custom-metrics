@@ -29,7 +29,7 @@ var _ = Describe("input.controler.secret.predicate", func() {
 		It("should return true if the event target is a shoot control plane secret, containing the shoot's "+
 			"kube-apiserver CA certificate or metrics scraping access token", func() {
 
-			for _, name := range []string{"ca", "shoot-access-prometheus"} {
+			for _, name := range []string{"ca", "shoot-access-gardener-custom-metrics"} {
 				// Arrange
 				predicate := NewPredicate(logr.Discard())
 				oldSecret := newTestSecret(name)
@@ -47,7 +47,7 @@ var _ = Describe("input.controler.secret.predicate", func() {
 			}
 		})
 		It("should return false if the event target is not in a shoot namespace", func() {
-			for _, name := range []string{"ca", "shoot-access-prometheus"} {
+			for _, name := range []string{"ca", "shoot-access-gardener-custom-metrics"} {
 				// Arrange
 				predicate := NewPredicate(logr.Discard())
 				oldSecret := newTestSecret(name)
@@ -66,7 +66,7 @@ var _ = Describe("input.controler.secret.predicate", func() {
 			}
 		})
 		It("should return true if the event target is not a secret", func() {
-			for _, name := range []string{"ca", "shoot-access-prometheus"} {
+			for _, name := range []string{"ca", "shoot-access-gardener-custom-metrics"} {
 				// Arrange
 				predicate := NewPredicate(logr.Discard())
 				oldSecret := newTestSecret(name)

@@ -60,6 +60,7 @@ var _ = Describe("RESTOptions", func() {
 			Expect(output.ForwardedKubeconfig).To(Equal(customKubeconfig))
 			Expect(output.ForwardedMasterUrl).To(Equal(kapiUrl))
 		})
+
 		It("should use the specified master URL and fall back to kubeconfig from environment variable", func() {
 			// Arrange
 			options, output := newRestOptions()
@@ -74,6 +75,7 @@ var _ = Describe("RESTOptions", func() {
 			Expect(output.ForwardedKubeconfig).To(Equal(envKubeconfig))
 			Expect(output.ForwardedMasterUrl).To(Equal(kapiUrl))
 		})
+
 		It("should fall back to in-cluster config", func() {
 			// Arrange
 			options, output := newRestOptions()
@@ -91,6 +93,7 @@ var _ = Describe("RESTOptions", func() {
 			Expect(output.ForwardedMasterUrl).To(Equal(inCluster))
 			Expect(output.ForwardedKubeconfig).To(Equal(inCluster))
 		})
+
 		It("should fall back to default kubeconfig location", func() {
 			// Arrange
 			options, output := newRestOptions()

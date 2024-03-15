@@ -6,12 +6,12 @@ import (
 )
 
 var _ = Describe("uti/gardener", func() {
-	Describe("IsShootCPNamespace", func() {
+	Describe("IsShootNamespace", func() {
 		It("should work expected on certain predefined values", func() {
-			Expect(IsShootCPNamespace("shoot--my-shoot")).To(BeTrue())
-			Expect(IsShootCPNamespace("shoot-my-shoot")).To(BeFalse())
-			Expect(IsShootCPNamespace("")).To(BeFalse())
-			Expect(IsShootCPNamespace("shoot--my--shoot")).To(BeTrue())
+			Expect(IsShootNamespace("shoot--my-shoot")).To(BeTrue())
+			Expect(IsShootNamespace("shoot-my-shoot")).To(BeFalse())
+			Expect(IsShootNamespace("")).To(BeFalse())
+			Expect(IsShootNamespace("shoot--my--shoot")).To(BeTrue())
 		})
 	})
 })

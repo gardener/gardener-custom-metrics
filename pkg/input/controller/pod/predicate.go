@@ -44,7 +44,7 @@ func isPodLabeledAsShootKapi(pod client.Object) bool {
 }
 
 func isKapiPod(pod *corev1.Pod) bool {
-	return gutil.IsShootCPNamespace(pod.Namespace) && isPodLabeledAsShootKapi(pod)
+	return gutil.IsShootNamespace(pod.Namespace) && isPodLabeledAsShootKapi(pod)
 }
 
 // Is the object a shoot CP pod, containing one of shoot's kube-apiserver instances
@@ -74,7 +74,7 @@ func (p *podPredicate) Update(e event.UpdateEvent) (result bool) {
 		p.log.Error(nil, "Update event has no new object")
 		return false
 	}
-	if !gutil.IsShootCPNamespace(e.ObjectNew.GetNamespace()) {
+	if !gutil.IsShootNamespace(e.ObjectNew.GetNamespace()) {
 		return false
 	}
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctlmgr "sigs.k8s.io/controller-runtime/pkg/manager"
 
@@ -16,7 +17,8 @@ import (
 )
 
 // HAService is the main type of the package. It takes care of concerns related to running the application in high
-// availability mode.
+// availability mode. When running in active/passive replication mode, HAService ensures that all requests go to the
+// active replica.
 // HAService implements [ctlmgr.Runnable].
 // For information about individual fields, see NewHAService().
 type HAService struct {
@@ -61,10 +63,15 @@ func (ha *HAService) setEndpoints(ctx context.Context) error {
 	endpoints := corev1.Endpoints{}
 	err := ha.manager.GetClient().Get(ctx, client.ObjectKey{Namespace: ha.namespace, Name: app.Name}, &endpoints)
 	if err != nil {
-		return fmt.Errorf("updating the service endpoint to point to the new leader: retrieving endpoints: %w", err)
+		if !errors.IsNotFound(err) {
+			return fmt.Errorf("updating the service endpoint to point to the new leader: retrieving endpoints: %w", err)
+		}
+
+		endpoints.ObjectMeta.Namespace = ha.namespace
+		endpoints.ObjectMeta.Name = app.Name
 	}
 
-	endpoints.ObjectMeta.Labels = map[string]string{"app": app.Name}
+	endpoints.ObjectMeta.Labels = map[string]string{"app": app.Name, "resources.gardener.cloud/managed-by": "gardener"}
 	endpoints.Subsets = []corev1.EndpointSubset{{
 		Addresses: []corev1.EndpointAddress{{IP: ha.servingIPAddress}},
 		Ports:     []corev1.EndpointPort{{Port: int32(ha.servingPort), Protocol: "TCP"}},

@@ -30,7 +30,7 @@ import (
 
 const (
 	secretNameCA          = "ca"
-	secretNameAccessToken = "shoot-access-prometheus"
+	secretNameAccessToken = "shoot-access-gardener-custom-metrics"
 )
 
 // The secret actuator acts upon shoot secrets, maintaining the information necessary to scrape

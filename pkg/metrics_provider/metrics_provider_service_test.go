@@ -30,6 +30,7 @@ var _ = Describe("MetricsService", func() {
 			}
 		})
 	})
+
 	Describe("CompleteCLIConfiguration", func() {
 		It("should create a MetricsProvider based on the specified configuration", func() {
 			// Arrange

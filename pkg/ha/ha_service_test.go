@@ -52,6 +52,7 @@ var _ = Describe("HAService", func() {
 			Expect(actual.Subsets[0].Ports).To(HaveLen(1))
 			Expect(actual.Subsets[0].Ports[0].Port).To(Equal(int32(testPort)))
 		})
+
 		It("should wait and retry with exponential backoff, if the service endpoints are missing, and succeed "+
 			"once they appear", func() {
 
@@ -98,6 +99,7 @@ var _ = Describe("HAService", func() {
 			Expect(actual.Subsets[0].Addresses).To(HaveLen(1))
 			Expect(actual.Subsets[0].Addresses[0].IP).To(Equal(testIPAddress))
 		})
+
 		It("should immediately abort retrying, if the context gets canceled", func() {
 			// Arrange
 			manager := testutil.NewFakeManager()
@@ -129,6 +131,7 @@ var _ = Describe("HAService", func() {
 			err = manager.GetClient().Get(context.Background(), kclient.ObjectKey{Namespace: testNs, Name: app.Name}, &actual)
 			Expect(err).To(HaveOccurred())
 		})
+
 		It("should use exponential backoff", func() {
 
 			// Arrange

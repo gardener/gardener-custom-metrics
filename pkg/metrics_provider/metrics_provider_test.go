@@ -45,6 +45,7 @@ var _ = Describe("MetricsProvider", func() {
 			Expect(err).To(Succeed())
 			Expect(metricValue).To(BeNil())
 		})
+
 		It("should return metrics for the Kapi pod specified by the namespaced name", func() {
 			// Arrange
 			idr := input_data_registry.FakeInputDataRegistry{}
@@ -72,6 +73,7 @@ var _ = Describe("MetricsProvider", func() {
 			Expect(val.DescribedObject.APIVersion).To(Equal("v1"))
 			Expect(val.DescribedObject.Kind).To(Equal("Pod"))
 		})
+
 		It("should respect maxSampleAge", func() {
 			// Arrange
 			idr := input_data_registry.FakeInputDataRegistry{}
@@ -97,6 +99,7 @@ var _ = Describe("MetricsProvider", func() {
 			Expect(valStillGood).NotTo(BeNil())
 			Expect(valStillGood.DescribedObject.Name).To(Equal(testPodName + "2"))
 		})
+
 		It("should respect maxSampleGap", func() {
 			// Arrange
 			idr := input_data_registry.FakeInputDataRegistry{}
@@ -123,6 +126,7 @@ var _ = Describe("MetricsProvider", func() {
 			Expect(valGood.DescribedObject.Name).To(Equal(testPodName))
 		})
 	})
+
 	Describe("GetMetricBySelector", func() {
 		It("should return nothing if there are no Kapis", func() {
 			// Arrange
@@ -138,6 +142,7 @@ var _ = Describe("MetricsProvider", func() {
 			Expect(metricValue).NotTo(BeNil())
 			Expect(metricValue.Items).To(HaveLen(0))
 		})
+
 		It("should return only metrics for Kapi pods which match the selector", func() {
 			// Arrange
 			idr := input_data_registry.FakeInputDataRegistry{}

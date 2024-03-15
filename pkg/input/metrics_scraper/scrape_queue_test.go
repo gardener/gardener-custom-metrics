@@ -126,6 +126,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			Expect(pm.RateDebtLimit.Load()).To(BeZero())
 			Expect(int(pm.RateSurplusLimit.Load())).To(Equal(surplusLimit))
 		})
+
 		It("should subscribe the scrapeQueue for InputDataRegistry events, including events for objects already in the registry", func() {
 			// Arrange
 
@@ -138,6 +139,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			Expect(idr.ShouldWatcherNotifyOfPreexisting).To(BeTrue())
 		})
 	})
+
 	Describe("onKapiUpdated", func() {
 		Context("if the event is an add", func() {
 			It("should update the pacemaker with MinRate = ScrapeTargetCount / ScrapePeriod, DebtLimit = 0", func() {
@@ -159,6 +161,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 						pacemaker.RateSurplusLimit.Load() == surplusLimit
 				}).Should(BeTrue())
 			})
+
 			It("should add the new target to the queue", func() {
 				// Arrange
 				sq, idr, _ := newTestScrapeQueue(1 * time.Minute)
@@ -179,6 +182,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 				}).Should(BeTrue())
 			})
 		})
+
 		Context("if the event is a remove", func() {
 			It("should update the pacemaker with MinRate = ScrapeTargetCount / ScrapePeriod, DebtLimit = 0", func() {
 				// Arrange
@@ -202,6 +206,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 						pacemaker.RateSurplusLimit.Load() == surplusLimit
 				}).Should(BeTrue())
 			})
+
 			It("should remove the new target from the queue", func() {
 				// Arrange
 				sq, idr, _ := newTestScrapeQueue(1 * time.Minute)
@@ -225,6 +230,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 					return next != nil && next.PodName == podName+"2"
 				}).Should(BeTrue())
 			})
+
 			It("should have no effect if the target is missing", func() {
 				// Arrange
 				sq, idr, _ := newTestScrapeQueue(1 * time.Minute)
@@ -244,6 +250,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 				}).Should(BeTrue())
 			})
 		})
+
 		Context("if the event is of unknown type", func() {
 			It("should have no effect", func() {
 				// Arrange
@@ -268,6 +275,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			})
 		})
 	})
+
 	Describe("GetNext", func() {
 		It("should return nil if the queue contains only targets which are missing from the registry", func() {
 			// Arrange
@@ -282,6 +290,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(result).To(BeNil())
 		})
+
 		It("on a queue with multiple targets and a newly added target, should immediately request an eager scrape for the new target", func() {
 			// Arrange
 			sq, idr, pm := newTestScrapeQueue(1 * time.Minute)
@@ -300,6 +309,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(next.PodName).To(Equal(podName + "2"))
 		})
+
 		It("should request a scrape operation from the scrape client, if the pacemaker grants permission", func() {
 			// Arrange
 			sq, idr, _ := newTestScrapeQueue(1 * time.Minute)
@@ -313,6 +323,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(next).To(Not(BeNil()))
 		})
+
 		It("should not request a scrape operation from the scrape client, if the pacemaker denies permission", func() {
 			// Arrange
 			sq, idr, pm := newTestScrapeQueue(1 * time.Minute)
@@ -327,6 +338,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(next).To(BeNil())
 		})
+
 		It("upon successful scrape, should record the scrape time in the data registry", func() {
 			// Arrange
 			sq, idr, _ := newTestScrapeQueue(1 * time.Minute)
@@ -341,6 +353,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(idr.GetKapiData(nsName, podName).LastMetricsScrapeTime).To(Equal(testutil.NewTimeNowStub(2, 0, 0)()))
 		})
+
 		It("should not change the last scrape time for the Kapi, if the pacemaker denies permission", func() {
 			// Arrange
 			sq, idr, pm := newTestScrapeQueue(1 * time.Minute)
@@ -357,6 +370,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(idr.GetKapiData(nsName, podName).LastMetricsScrapeTime).To(Equal(initialScrapeTime))
 		})
+
 		It("should return targets in a strictly cyclic order", func() {
 			// Arrange
 			sq, idr, _ := newTestScrapeQueue(1 * time.Minute)
@@ -384,6 +398,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 				}
 			}
 		})
+
 		It("should return nil if there are only ineligible targets at the time of the call", func() {
 			// Arrange
 			sq, idr, pm := newTestScrapeQueue(1 * time.Minute)
@@ -402,6 +417,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(next).To(BeNil())
 		})
+
 		It("should return nil, if the queue is empty", func() {
 			// Arrange
 			sq, _, _ := newTestScrapeQueue(1 * time.Minute)
@@ -414,6 +430,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(next).To(BeNil())
 		})
+
 		It("should request an eager/lazy scrape from the pacemaker, depending on whether one scrape period has "+
 			"elapsed since the time the next target was last scraped", func() {
 
@@ -441,6 +458,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			Expect(sq.GetNext()).NotTo(BeNil()) // Eager again
 			Expect(sq.GetNext()).To(BeNil())    // Not eager
 		})
+
 		It("should skip targets which are missing from the registry, and return the first target which is not missing", func() {
 			// Arrange
 			sq, idr, pm := newTestScrapeQueue(1 * time.Minute)
@@ -462,6 +480,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			Expect(sq.GetNext()).To(BeNil()) // This should be back to the first target, thus not eager
 		})
 	})
+
 	Describe("DueCount", func() {
 		It("on an empty queue should return zero", func() {
 			// Arrange
@@ -473,6 +492,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(due).To(BeZero())
 		})
+
 		It("should return zero if the queue contains only targets which are missing from the registry", func() {
 			// Arrange
 			sq, idr, _ := newTestScrapeQueue(1 * time.Minute)
@@ -487,6 +507,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(due).To(BeZero())
 		})
+
 		It("should count targets exactly after one scraping period passes from their last scrape. It should count "+
 			"targets which have never been scraped, if, and only if the excludeUnscraped parameter is false", func() {
 
@@ -519,6 +540,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			Expect(sq.DueCount(thirdScrapeTime, true)).To(Equal(20))
 		})
 	})
+
 	Describe("Close", func() {
 		It("should terminate the scrapeQueue's subscription to InputDataRegistry events", func() {
 			// Arrange
@@ -531,6 +553,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			// Assert
 			Expect(idr.Watcher).To(BeNil())
 		})
+
 		It("should terminate the processing of InputDataRegistry events", func() {
 			// Arrange
 			sq, idr, _ := newTestScrapeQueue(1 * time.Minute)

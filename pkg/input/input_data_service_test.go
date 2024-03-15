@@ -54,6 +54,7 @@ var _ = Describe("input.inputDataService", func() {
 			Expect(ids.inputDataRegistry.(*input_data_registry.FakeInputDataRegistry).MinSampleGap).To(Equal(testMinSampleGap))
 		})
 	})
+
 	Describe("DataSource", func() {
 		It("should point to the same registry at the one supplied to the scraper", func() {
 			// Arrange
@@ -69,6 +70,7 @@ var _ = Describe("input.inputDataService", func() {
 			Expect(kapis[0].PodName()).To(Equal("pod"))
 		})
 	})
+
 	Describe("AddToManager", func() {
 		It("should add the scraper, pod controller, and secret controller to the manager", func() {
 			// Arrange
@@ -83,6 +85,7 @@ var _ = Describe("input.inputDataService", func() {
 			Expect(testutil.GetRunnables[*metrics_scraper.Scraper](fm)).To(HaveLen(1))
 			Expect(testutil.GetRunnables[controller.Controller](fm)).To(HaveLen(2))
 		})
+
 		It("should add apimachinery runtime types scheme to the manager", func() {
 			// Arrange
 			ids, _ := newInputDataService()
@@ -100,6 +103,7 @@ var _ = Describe("input.inputDataService", func() {
 				Expect(fm.Scheme.Recognizes(gvk)).To(BeTrue())
 			}
 		})
+
 		It("should create a new data registry and pass it to the scraper", func() {
 			// Arrange
 			ids, _ := newInputDataService()
@@ -124,6 +128,7 @@ var _ = Describe("input.inputDataService", func() {
 			Expect(registryPassedToScraperConstructor).NotTo(BeNil())
 			Expect(registryPassedToScraperConstructor == ids.inputDataRegistry).To(BeTrue())
 		})
+
 		It("should configure the scraper with the specified scrape period and flow control period", func() {
 			// Arrange
 			ids, _ := newInputDataService()
