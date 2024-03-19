@@ -23,10 +23,11 @@ require (
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 	sigs.k8s.io/controller-runtime v0.11.2 // v0.12.1
 	sigs.k8s.io/custom-metrics-apiserver v1.23.0 // v1.22.0 // v1.23.0
-	sigs.k8s.io/metrics-server v0.6.4
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/NYTimes/gziphandler v1.1.1 // indirect
 	github.com/PuerkitoBio/purell v1.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -69,6 +70,8 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.31.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
+	github.com/spf13/afero v1.9.4 // indirect
+	github.com/stretchr/testify v1.8.2 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.7 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.7 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.7 // indirect
