@@ -16,7 +16,7 @@ require (
 	k8s.io/api v0.23.17 // v0.24.0 // v0.24.4
 	k8s.io/apimachinery v0.23.17 // v0.24.0 // v0.24.4
 	k8s.io/apiserver v0.23.17 // v0.24.4
-	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/client-go v0.23.17
 	k8s.io/component-base v0.23.17 // v0.24.0 // v0.24.4
 	k8s.io/kube-openapi v0.0.0-20220124234850-424119656bbf // v0.0.0-20220124234850-424119656bbf // v0.0.0-20220328201542-3ee0da9b0b42
 	k8s.io/metrics v0.23.17 // v0.24.4
@@ -108,5 +108,3 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-replace k8s.io/client-go => k8s.io/client-go v0.23.17 // v0.24.4
