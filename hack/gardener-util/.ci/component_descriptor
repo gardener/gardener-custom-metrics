@@ -4,7 +4,7 @@
 #
 # COMPONENT_PREFIXES: Set the image prefix that should be used to
 #                     determine if an image is defined by another component.
-#                     Defaults to "eu.gcr.io/gardener-project/gardener"
+#                     Defaults to "europe-docker.pkg.dev/gardener-project/releases/gardener"
 #
 # GENERIC_DEPENDENCIES: Set images that are generic dependencies with no specific tag.
 #                       Defaults to "hyperkube,kube-apiserver,kube-controller-manager,kube-scheduler,kube-proxy"
@@ -51,7 +51,7 @@ echo "Enriching component descriptor from ${BASE_DEFINITION_PATH}"
 if [[ -f "$repo_root_dir/charts/images.yaml" ]]; then
   # default environment variables
   if [[ -z "${COMPONENT_PREFIXES}" ]]; then
-    COMPONENT_PREFIXES="eu.gcr.io/gardener-project/gardener"
+    COMPONENT_PREFIXES="europe-docker.pkg.dev/gardener-project/releases/gardener"
   fi
   if [[ -z "${GENERIC_DEPENDENCIES}" ]]; then
     GENERIC_DEPENDENCIES="hyperkube,kube-apiserver,kube-controller-manager,kube-scheduler,kube-proxy"
@@ -89,10 +89,10 @@ if [[ -d "$repo_root_dir/charts/" ]]; then
       REPOSITORY=${imageAndTag[0]}
       TAG=${imageAndTag[1]}
 
-      gardener="eu.gcr.io/gardener-project/gardener"
+      gardener="europe-docker.pkg.dev/gardener-project/releases/gardener"
       if [[ "$NAME" == "hyperkube" ]]; then
         ${ADD_DEPENDENCIES_CMD} --generic-dependencies "{\"name\": \"$NAME\", \"version\": \"$TAG\"}"
-      elif [[ $REPOSITORY =~ "eu.gcr.io/gardener-project/gardener"* ]]; then
+      elif [[ $REPOSITORY =~ "europe-docker.pkg.dev/gardener-project/releases/gardener"* ]]; then
         ${ADD_DEPENDENCIES_CMD} --generic-dependencies "{\"name\": \"$NAME\", \"version\": \"$TAG\"}"
       else
         ${ADD_DEPENDENCIES_CMD} --container-image-dependencies "{\"name\": \"${NAME}\", \"image_reference\": \"${REPOSITORY}:${TAG}\", \"version\": \"$TAG\"}"

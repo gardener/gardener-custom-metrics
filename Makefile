@@ -14,7 +14,7 @@
 
 BUILD_DATE                  := $(shell date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([0-9][0-9]\)$$/:\1/g')
 NAME                        := gardener-custom-metrics
-IMAGE_REGISTRY_URI          := eu.gcr.io/gardener-project/gardener
+IMAGE_REGISTRY_URI          := europe-docker.pkg.dev/gardener-project/releases/gardener
 REPO_ROOT                   := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 VERSION                     := $(shell cat "$(REPO_ROOT)/VERSION")
 EFFECTIVE_VERSION           := $(VERSION)-$(shell git rev-parse HEAD)

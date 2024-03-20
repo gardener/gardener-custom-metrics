@@ -5,7 +5,7 @@ metadata:
   name: gardener-custom-metrics
 build:
   artifacts:
-    - image: eu.gcr.io/gardener-project/gardener/gardener-custom-metrics
+    - image: europe-docker.pkg.dev/gardener-project/releases/gardener/gardener-custom-metrics
       ko:
         dependencies:
           paths:
