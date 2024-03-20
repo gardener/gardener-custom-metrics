@@ -11,13 +11,11 @@ spec:
     matchLabels:
       app: gardener-custom-metrics
       gardener.cloud/role: gardener-custom-metrics
-      resources.gardener.cloud/managed-by: gardener
   template:
     metadata:
       labels:
         app: gardener-custom-metrics
         gardener.cloud/role: gardener-custom-metrics
-        resources.gardener.cloud/managed-by: gardener
         networking.gardener.cloud/from-seed: allowed
         networking.gardener.cloud/to-dns: allowed
         networking.gardener.cloud/to-runtime-apiserver: allowed

@@ -71,7 +71,7 @@ func (ha *HAService) setEndpoints(ctx context.Context) error {
 		endpoints.ObjectMeta.Name = app.Name
 	}
 
-	endpoints.ObjectMeta.Labels = map[string]string{"app": app.Name, "resources.gardener.cloud/managed-by": "gardener"}
+	endpoints.ObjectMeta.Labels = map[string]string{"app": app.Name}
 	endpoints.Subsets = []corev1.EndpointSubset{{
 		Addresses: []corev1.EndpointAddress{{IP: ha.servingIPAddress}},
 		Ports:     []corev1.EndpointPort{{Port: int32(ha.servingPort), Protocol: "TCP"}},
