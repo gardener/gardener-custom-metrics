@@ -24,8 +24,5 @@ profiles:
     manifests:
       rawYaml:
         - example/custom-metrics-deployment.yaml
-#      kustomize:
-#        paths:
-#          - example/provider-local/seed-kind2/skaffold
     deploy:
       kubectl: {}
