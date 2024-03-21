@@ -1,14 +1,18 @@
 module github.com/gardener/gardener-custom-metrics
 
-go 1.19
+go 1.22.0
 
 require (
 	github.com/go-logr/logr v1.2.4
+	github.com/onsi/ginkgo/v2 v2.11.0
+	github.com/onsi/gomega v1.27.8
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
+	go.uber.org/atomic v1.7.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 	golang.org/x/time v0.3.0
+	golang.org/x/tools v0.9.3
 	k8s.io/api v0.23.17 // v0.24.0 // v0.24.4
 	k8s.io/apimachinery v0.23.17 // v0.24.0 // v0.24.4
 	k8s.io/apiserver v0.23.17 // v0.24.4
@@ -20,12 +24,6 @@ require (
 	sigs.k8s.io/controller-runtime v0.11.2 // v0.12.1
 	sigs.k8s.io/custom-metrics-apiserver v1.23.0 // v1.22.0 // v1.23.0
 	sigs.k8s.io/metrics-server v0.6.4
-)
-
-require (
-	github.com/onsi/ginkgo/v2 v2.11.0
-	github.com/onsi/gomega v1.27.8
-	golang.org/x/tools v0.9.3
 )
 
 require (
@@ -85,7 +83,6 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.20.0 // indirect
 	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.7.0 // indirect
-	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect

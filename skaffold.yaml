@@ -1,0 +1,28 @@
+---
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: gardener-custom-metrics
+build:
+  artifacts:
+    - image: eu.gcr.io/gardener-project/gardener/gardener-custom-metrics
+      ko:
+        dependencies:
+          paths:
+            - cmd/**
+            - example/**
+            - pkg/**
+            - vendor/**
+            - VERSION
+        ldflags:
+          - '{{.LD_FLAGS}}'
+        main: ./cmd/gardener-custom-metrics
+profiles:
+  - name: debug
+    activation:
+      - command: debug
+    manifests:
+      rawYaml:
+        - example/custom-metrics-deployment.yaml
+    deploy:
+      kubectl: {}

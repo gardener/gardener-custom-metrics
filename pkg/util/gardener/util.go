@@ -7,10 +7,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 )
 
-// IsShootCPNamespace determines whether the format of specified name implies that it is a shoot namespace in a seed
+// IsShootNamespace determines whether the format of specified name implies that it is a shoot namespace in a seed
 // cluster
-func IsShootCPNamespace(namespace string) bool {
-	return strings.HasPrefix(namespace, "shoot--")
+func IsShootNamespace(namespace string) bool {
+	return strings.HasPrefix(namespace, "shoot-")
 }
 
 // WatchBuilder holds various functions which add watch controls to the passed Controller.

@@ -53,7 +53,7 @@ type pacemakerImpl struct {
 
 // newPacemaker creates a rate limiter which maintains the rate of some repeating operation between a set minimum and
 // maximum.
-// Withing the space between min and max, the exact rate is determined depending on whether the client is eager to
+// Within the space between min and max, the exact rate is determined depending on whether the client is eager to
 // perform the operation. Eager requests are governed by "no more than max rate". Non-eager requests follow a
 // "no less than min rate" schedule.
 //

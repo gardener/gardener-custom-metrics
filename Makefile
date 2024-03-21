@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+BUILD_DATE := $(shell date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([0-9][0-9]\)$$/:\1/g')
 NAME                        := gardener-custom-metrics
-# IMAGE_REGISTRY_URI          := eu.gcr.io/gardener-project/gardener/$(NAME)
-IMAGE_REGISTRY_URI          := eu.gcr.io/sap-se-gcp-scp-k8s/$(NAME)
+IMAGE_REGISTRY_URI          := eu.gcr.io/gardener-project/gardener
 REPO_ROOT                   := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 VERSION                     := $(shell cat "$(REPO_ROOT)/VERSION")
 EFFECTIVE_VERSION           := $(VERSION)-$(shell git rev-parse HEAD)
@@ -30,7 +30,9 @@ ifneq ($(strip $(shell git status --porcelain 2>/dev/null)),)
 	EFFECTIVE_VERSION := $(EFFECTIVE_VERSION)-dirty
 endif
 
+# In debug, do not use the -w flag. It strips useful debug information.
 LD_FLAGS := "-w $(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(EXTENSION_PREFIX)-$(NAME))"
+LD_FLAGS_DEBUG := "$(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(EXTENSION_PREFIX)-$(NAME))"
 
 TOOLS_DIR := $(REPO_ROOT)/hack/gardener-util/tools
 include $(REPO_ROOT)/hack/gardener-util/tools.mk
@@ -136,3 +138,19 @@ verify: check check-docforge format test
 
 .PHONY: verify-extended
 verify-extended: check-generate check check-docforge format test test-cov test-clean
+
+# skaffold dev and debug clean up deployed modules by default, disable this
+debug: export SKAFFOLD_CLEANUP = false
+# Artifacts might be already built when you decide to start debugging.
+# However, these artifacts do not include the gcflags which `skaffold debug` sets automatically, so delve would not work.
+# Disabling the skaffold cache for debugging ensures that you run artifacts with gcflags required for debugging.
+debug: export SKAFFOLD_CACHE_ARTIFACTS = false
+
+debug: export SOURCE_DATE_EPOCH = $(shell date -d $(BUILD_DATE) +%s)
+
+.PHONY: debug
+debug: $(SKAFFOLD)
+	@LD_FLAGS=$(LD_FLAGS_DEBUG) $(SKAFFOLD) debug
+
+	# TODO: Andrey: P1: Inject TLS secret name dynamically into deployment
+	# GCMX_TLS_SECRET_NAME=$(kubectl -n garden get secrets | grep '^gardener-custom-metrics' | head -n 1 | awk '{print $1}') \

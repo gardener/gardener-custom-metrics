@@ -49,7 +49,7 @@ func (p *secretPredicate) isRelevantSecret(obj client.Object) bool {
 		return false
 	}
 
-	return gutil.IsShootCPNamespace(secret.Namespace) &&
+	return gutil.IsShootNamespace(secret.Namespace) &&
 		(secret.Name == secretNameCA || secret.Name == secretNameAccessToken)
 }
 

@@ -93,7 +93,7 @@ func (mc *metricsClientImpl) GetKapiInstanceMetrics(
 	}(response.Body)
 
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		return 0, fmt.Errorf("metrics client: responce reported HTTP status %d", response.StatusCode)
+		return 0, fmt.Errorf("metrics client: response reported HTTP status %d", response.StatusCode)
 	}
 
 	// If the server returned compressed response, use decompressing reader
@@ -117,7 +117,9 @@ func (mc *metricsClientImpl) GetKapiInstanceMetrics(
 //   - an optional error
 //
 // Exactly one of the int64 value and the error is non-zero.
-func getTotalRequestCount(metricsStream io.ReadCloser) (int64, error) {
+func getTotalRequestCount(metricsStream io.Reader) (int64, error) {
+	// Limit the metrics response as a general precaution. It should be < 5MB, so if we're getting >20MB something's wrong
+	metricsStream = &io.LimitedReader{R: metricsStream, N: 20 * 1024 * 1024}
 	reader := bufio.NewReader(metricsStream)
 
 	totalRequestCount := int64(0)

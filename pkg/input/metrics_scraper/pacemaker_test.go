@@ -51,6 +51,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 			Expect(pm.config.RateDebtLimit).To(Equal(creationConfig.RateDebtLimit))
 			Expect(pm.config.RateSurplusLimit).To(Equal(creationConfig.RateSurplusLimit))
 		})
+
 		It("should create a pacemaker with zero debt", func() {
 			// Arrange
 			creationConfig := &pacemakerConfig{
@@ -66,6 +67,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 			// Assert
 			Expect(pm.GetScrapePermission(false)).To(BeFalse())
 		})
+
 		It("should create a pacemaker with zero surplus", func() {
 			// Arrange
 			creationConfig := &pacemakerConfig{
@@ -81,6 +83,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 			Expect(pm.GetScrapePermission(true)).To(BeFalse())
 		})
 	})
+
 	Describe("UpdateRate", func() {
 		It("should write the specified MinRate value to the pacemaker's configuration", func() {
 			// Arrange
@@ -92,6 +95,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 			// Assert
 			Expect(pm.config.MinRate).To(Equal(float64(777)))
 		})
+
 		It("should write the specified RateDebtLimit value to the pacemaker's configuration", func() {
 			// Arrange
 			pm := newTestPacemakerWithTestWorthyConfiguration()
@@ -103,6 +107,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 			Expect(pm.config.RateDebtLimit).To(Equal(777))
 		})
 	})
+
 	Describe("GetScrapePermission", func() {
 		Context("if the scrape is eager", func() {
 			Context("starting from a state of zero debt and surplus", func() {
@@ -118,6 +123,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 					Expect(pm.GetScrapePermission(true)).To(BeFalse())
 				})
 			})
+
 			Context("starting from a state of exhausted surplus", func() {
 				It("should grant permission to as many calls, as correspond to MaxRate, and deny the next one", func() {
 					// Arrange
@@ -145,6 +151,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 					Expect(pm.GetScrapePermission(true)).To(BeFalse())
 				})
 			})
+
 			Context("starting from a state of high debt", func() {
 				It("should allow RateSurplusLimit immediate calls, then deny the next call", func() {
 
@@ -168,6 +175,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 				})
 			})
 		})
+
 		Context("if the scrape is not eager", func() {
 			Context("starting from a state of zero debt", func() {
 				It("after a period of inactivity which does not exceed the debt limit, should allow as many "+
@@ -194,6 +202,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 					}
 					Expect(pm.GetScrapePermission(false)).To(BeFalse())
 				})
+
 				It("after a period of inactivity which exceeds the debt limit, should allow RateDebtLimit "+
 					"immediate calls, and deny the next one", func() {
 
@@ -218,6 +227,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 					}
 					Expect(pm.GetScrapePermission(false)).To(BeFalse())
 				})
+
 				It("if time has not passed, should not allow any immediate calls", func() {
 					// Arrange
 					pm := newTestPacemaker(2, 4, 20, 10)
@@ -230,6 +240,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 				})
 			})
 		})
+
 		Context("starting from a state of high debt", func() {
 			It("should allow as many immediate calls, as the value of the initial debt, if they don't exceed "+
 				"MaxRate, and then deny the next call if it is not eager", func() {
@@ -257,6 +268,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 					Expect(pm.GetScrapePermission(false)).To(BeFalse())
 				}
 			})
+
 			It("should still be limited to MaxRate", func() {
 				// Arrange
 				secondsElapsed := 2
@@ -292,6 +304,7 @@ var _ = Describe("input.metrics_scraper.pacemakerImpl", func() {
 				}
 			})
 		})
+
 		It("should perform as expected in one complex scenario", func() {
 			// This one last test case does not follow the good practice of simplicity and testing just one thing.
 			// It uses a complex scenario, in attempt to catch potential issues missed by the above simple cases.

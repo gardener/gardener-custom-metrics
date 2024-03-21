@@ -36,7 +36,7 @@ gardener-custom-metrics:
     release:
       steps:
         verify:
-          image: 'golang:1.19.9'
+          image: 'golang:1.22.1'
       traits:
         version:
           preprocess: 'finalize'

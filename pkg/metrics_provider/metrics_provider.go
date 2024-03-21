@@ -119,7 +119,7 @@ func (mp *MetricsProvider) getMetricByPredicate(
 	metricInfo provider.CustomMetricInfo) (*custom_metrics.MetricValueList, error) {
 
 	if metricInfo.Metric != metricName {
-		return nil, nil
+		return &custom_metrics.MetricValueList{}, nil
 	}
 
 	kapis := mp.dataSource.GetShootKapis(namespace)

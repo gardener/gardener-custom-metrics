@@ -93,7 +93,7 @@ rules:
       - ""
     resources:
       - secrets
-    # resourceNames: [ "ca", "shoot-access-prometheus" ] # TODO: Andrey: P1: How to write code so we can use name-based restriction?
+    # resourceNames: [ "ca", "shoot-access-gardener-custom-metrics" ] # TODO: Andrey: P1: How to write code so we can use name-based restriction?
     verbs:
       - get
       - list

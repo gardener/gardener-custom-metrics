@@ -122,6 +122,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Expect(scraper.queue.(*scrapeQueueImpl).scrapePeriod).To(Equal(scrapePeriod))
 		})
 	})
+
 	Describe("Start", func() {
 		It("should poll until context cancelled, and stop polling when the context is cancelled", func() {
 			// Arrange
@@ -160,6 +161,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Consistently(isRunning.Load).Should(BeFalse())
 			abortChan <- true
 		})
+
 		It("should not exit before all workers exit", func() {
 			// Arrange
 			scraper, idr, sq, _, ticker, _ := newTestScraper()
@@ -187,6 +189,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			scraper.activeWorkerCount.Add(-1)
 			Eventually(isRunning.Load).Should(BeFalse())
 		})
+
 		It("should close scrape queue before exiting", func() {
 			// Arrange
 			scraper, idr, sq, _, _, _ := newTestScraper()
@@ -206,6 +209,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Eventually(isRunning.Load).Should(BeFalse())
 			Expect(sq.IsClosed()).To(BeTrue())
 		})
+
 		It("upon first invocation with multiple targets, should start 2 workers, then, if no scrapes are "+
 			"recorded, double upon each ticker tick, until it gets capped to the number of targets", func() {
 
@@ -231,6 +235,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 				Consistently(metrics.WorkerProcCount.Load).Should(Equal(expected))
 			}
 		})
+
 		It("if last shift managed to scrape all of its targets, should attempt scraping with one less worker", func() {
 			// Arrange
 			scraper, idr, sq, _, ticker, metrics := newTestScraper()
@@ -252,6 +257,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 
 			Eventually(metrics.WorkerProcCount.Load).Should(Equal(int32(9)))
 		})
+
 		It("if last shift failed to scrape all of its targets, should increase worker count proportionally to "+
 			"last shift's throughput and current due target count", func() {
 
@@ -271,6 +277,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Eventually(metrics.WorkerProcCount.Load).Should(Equal(int32(6)))
 			Consistently(metrics.WorkerProcCount.Load).Should(Equal(int32(6)))
 		})
+
 		It("should consider leftover targets from last shift, when calculating this shift's worker count", func() {
 			// Arrange
 			// Last shift scraped 1 out of 6 targets with 6 workers. This shift has 3 new targets and 5 leftover
@@ -288,6 +295,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Eventually(metrics.WorkerProcCount.Load).Should(Equal(int32(8)))
 			Consistently(metrics.WorkerProcCount.Load).Should(Equal(int32(8)))
 		})
+
 		It("should respect maxShiftWorkerCount", func() {
 			// Arrange
 			// Last shift scraped 1 out of 6 targets with 6 workers. This shift has 10 new targets and 5 leftover
@@ -305,6 +313,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Eventually(metrics.WorkerProcCount.Load).Should(Equal(int32(10)))
 			Consistently(metrics.WorkerProcCount.Load).Should(Equal(int32(10)))
 		})
+
 		It("should respect minShiftWorkerCount", func() {
 			// Arrange
 			scraper, idr, sq, _, ticker, metrics := newTestScraper()
@@ -328,6 +337,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Eventually(metrics.WorkerProcCount.Load).Should(Equal(int32(1)))
 			Consistently(metrics.WorkerProcCount.Load).Should(Equal(int32(1)))
 		})
+
 		It("if the queue is empty, should slowly reduce the number of workers to 1", func() {
 			// Arrange
 			scraper, idr, sq, _, ticker, metrics := newTestScraper()
@@ -349,6 +359,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 				Eventually(scraper.activeWorkerCount.Load).Should(BeZero())
 			}
 		})
+
 		It("should respect maxActiveWorkerCount", func() {
 			// Arrange
 			scraper, idr, sq, _, ticker, metrics := newTestScraper()
@@ -367,6 +378,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Eventually(metrics.WorkerProcCount.Load).Should(Equal(int32(9)))
 			Consistently(metrics.WorkerProcCount.Load).Should(Equal(int32(9)))
 		})
+
 		It("should apply the specified scrapeFlowControlPeriod to the ticker it uses", func() {
 			// Arrange
 			schedulingPeriod := 100 * time.Millisecond
@@ -386,6 +398,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			// Assert
 			Eventually(fakeTicker.Period.Load).Should(Equal(int64(schedulingPeriod)))
 		})
+
 		It("should schedule scrape shifts when and only when the ticket ticks", func() {
 			// Arrange
 			scraper, idr, sq, _, ticker, metrics := newTestScraper()
@@ -406,6 +419,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			}
 		})
 	})
+
 	Describe("workerProc", func() {
 		It("polls the targets returned by GetNext(),until the context is cancelled", func() {
 			// Arrange
@@ -425,6 +439,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Consistently(client.WasScraped.Load).Should(BeFalse())
 			Expect(scraper.activeWorkerCount.Load()).To(BeZero())
 		})
+
 		It("if context has not been cancelled, polls the queue until GetNext() returns nil", func() {
 			// Arrange
 			scraper, idr, sq, client, _, _ := newTestScraper()
@@ -443,6 +458,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Consistently(client.WasScraped.Load).Should(BeFalse())
 			Expect(scraper.activeWorkerCount.Load()).To(BeZero())
 		})
+
 		It("if context has been cancelled, exits before scraping the queue", func() {
 			// Arrange
 			scraper, _, client, _, _ := arrangeWorkerTest()
@@ -456,6 +472,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			Consistently(client.WasScraped.Load).Should(BeFalse())
 			Expect(scraper.activeWorkerCount.Load()).To(BeZero())
 		})
+
 		It("should scrape each target returned by the queue", func() {
 			// Arrange
 			scraper, idr, sq, _, _, _ := newTestScraper()
@@ -475,6 +492,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 				Expect(kapi.TotalRequestCountNew).To(Equal(fakeMetricsClientMetricsValue))
 			}
 		})
+
 		Context("when scraping a target", func() {
 			It("should have no effect if the kapi is missing from the registry", func() {
 				// Arrange
@@ -492,6 +510,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 				Expect(client.WasScraped.Load()).To(BeFalse())
 				Expect(idr.GetKapiData(target.Namespace, target.PodName)).To(BeNil())
 			})
+
 			It("should have no effect if the auth secret is missing from the registry", func() {
 				// Arrange
 				scraper, idr, client, testMetrics, target := arrangeWorkerTest()
@@ -509,6 +528,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 				Expect(idr.GetKapiData(target.Namespace, target.PodName).TotalRequestCountNew).To(BeZero())
 				Expect(idr.GetKapiData(target.Namespace, target.PodName).MetricsTimeNew).To(BeZero())
 			})
+
 			It("should have no effect if the CA certificate is missing from the registry", func() {
 				// Arrange
 				scraper, idr, client, testMetrics, target := arrangeWorkerTest()
@@ -526,6 +546,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 				Expect(idr.GetKapiData(target.Namespace, target.PodName).TotalRequestCountNew).To(BeZero())
 				Expect(idr.GetKapiData(target.Namespace, target.PodName).MetricsTimeNew).To(BeZero())
 			})
+
 			It("should record the resulting metric value in the registry", func() {
 				// Arrange
 				scraper, idr, _, _, target := arrangeWorkerTest()
@@ -540,6 +561,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 					return idr.GetKapiData(target.Namespace, target.PodName).TotalRequestCountNew
 				}).Should(Equal(fakeMetricsClientMetricsValue))
 			})
+
 			It("should use scrapePeriod / 2 as timeout for individual scrapes", func() {
 				// Arrange
 				scraper, _, client, _, _ := arrangeWorkerTest()
