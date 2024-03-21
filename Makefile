@@ -154,10 +154,3 @@ debug: $(SKAFFOLD)
 
 	# TODO: Andrey: P1: Inject TLS secret name dynamically into deployment
 	# GCMX_TLS_SECRET_NAME=$(kubectl -n garden get secrets | grep '^gardener-custom-metrics' | head -n 1 | awk '{print $1}') \
-    # TODO: Andrey: P1: code cleanup
-	# export SKAFFOLD_DEFAULT_REPO = localhost:5001
-	# export SKAFFOLD_PUSH = true
-
-	# skaffold dev triggers new builds and deployments immediately on file changes by default,
-	# this is too heavy in a large project like gardener, so trigger new builds and deployments manually instead.
-	# gardener%dev gardenlet%dev operator-dev: export SKAFFOLD_TRIGGER = manual
