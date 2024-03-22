@@ -103,10 +103,6 @@ check-generate:
 	echo "Code generation is currently not implemented"
 	# @$(REPO_ROOT)/hack/gardener-util/check-generate.sh $(REPO_ROOT)
 
-.PHONY: check-docforge
-check-docforge: $(DOCFORGE)
-	@$(REPO_ROOT)/hack/gardener-util/check-docforge.sh $(REPO_ROOT) $(REPO_ROOT)/.docforge/manifest.yaml ".docforge/;docs/" $(NAME) false
-
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(HELM)
 	@$(REPO_ROOT)/hack/gardener-util/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
@@ -134,10 +130,10 @@ test-clean:
 	@$(REPO_ROOT)/hack/gardener-util/test-cover-clean.sh
 
 .PHONY: verify
-verify: check check-docforge format test
+verify: check format test
 
 .PHONY: verify-extended
-verify-extended: check-generate check check-docforge format test test-cov test-clean
+verify-extended: check-generate check format test test-cov test-clean
 
 # skaffold dev and debug clean up deployed modules by default, disable this
 debug: export SKAFFOLD_CLEANUP = false
