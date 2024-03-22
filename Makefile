@@ -133,7 +133,7 @@ test-clean:
 verify: check format test
 
 .PHONY: verify-extended
-verify-extended: check-generate check format test test-cov test-clean
+verify-extended: check-generate check format test-cov test-clean
 
 # skaffold dev and debug clean up deployed modules by default, disable this
 debug: export SKAFFOLD_CLEANUP = false
