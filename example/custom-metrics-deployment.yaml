@@ -63,8 +63,6 @@ spec:
               name: kube-api-access-gardener
               readOnly: true
       dnsPolicy: ClusterFirst
-      imagePullSecrets:
-        - name: gardener-custom-metrics-image-pull-secret
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:
