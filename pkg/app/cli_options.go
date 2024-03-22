@@ -139,16 +139,16 @@ func (c *CLIConfig) ManagerOptions() manager.Options {
 	// TODO: Andrey: P2: Enable after switching from prometheus' secret (which does not have 'name' label), to ours.
 	// It will prevent retrieving and caching unnecessary secrets.
 	//
-	//nameRequirement, _ := labels.NewRequirement("name", selection.In, []string{"ca", "shoot-access-gardener-custom-metrics"})
-	//selector := labels.NewSelector().Add(*nameRequirement)
-	//opts.NewCache = cache.BuilderWithOptions(cache.Options{
-	//	SelectorsByObject: cache.SelectorsByObject{
-	//		&corev1.Secret{}: {
-	//			// Field: fields.SelectorFromSet(fields.Set{"metadata.name": "ca"}),
-	//			Label: selector,
-	//		},
-	//	},
-	//})
+	// nameRequirement, _ := labels.NewRequirement("name", selection.In, []string{"ca", "shoot-access-gardener-custom-metrics"})
+	// selector := labels.NewSelector().Add(*nameRequirement)
+	// opts.NewCache = cache.BuilderWithOptions(cache.Options{
+	// 	SelectorsByObject: cache.SelectorsByObject{
+	// 		&corev1.Secret{}: {
+	// 			// Field: fields.SelectorFromSet(fields.Set{"metadata.name": "ca"}),
+	// 			Label: selector,
+	// 		},
+	// 	},
+	// })
 
 	return opts
 }
