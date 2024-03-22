@@ -12,7 +12,6 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	customexternalmetrics "sigs.k8s.io/custom-metrics-apiserver/pkg/apiserver"
 	basecmd "sigs.k8s.io/custom-metrics-apiserver/pkg/cmd"
-	"sigs.k8s.io/metrics-server/pkg/api"
 
 	generatedopenapi "github.com/gardener/gardener-custom-metrics/pkg/api/generated/openapi"
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
@@ -48,7 +47,7 @@ func NewMetricsProviderService() *MetricsProviderService {
 			Name: adapterName,
 			OpenAPIConfig: genericapiserver.DefaultOpenAPIConfig(
 				generatedopenapi.GetOpenAPIDefinitions,
-				openapinamer.NewDefinitionNamer(api.Scheme, customexternalmetrics.Scheme)),
+				openapinamer.NewDefinitionNamer(customexternalmetrics.Scheme)),
 		},
 		maxSampleAge:  90 * time.Second,
 		maxSampleGap:  600 * time.Second,
