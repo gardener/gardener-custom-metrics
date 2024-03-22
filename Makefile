@@ -115,7 +115,7 @@ generate: $(CONTROLLER_GEN) $(GEN_CRD_API_REFERENCE_DOCS) $(HELM) $(YQ)
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
-	@$(REPO_ROOT)/hack/gardener-util/format.sh ./cmd ./pkg ./test
+	@$(REPO_ROOT)/hack/gardener-util/format.sh ./cmd ./pkg
 
 .PHONY: test
 test: $(REPORT_COLLECTOR)
