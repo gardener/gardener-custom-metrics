@@ -11,7 +11,7 @@
 !hack/
 !pkg/
 !test/
-!hack/gardener-util/tools/
+!third_party/
 !vendor/
 
 !.gitignore

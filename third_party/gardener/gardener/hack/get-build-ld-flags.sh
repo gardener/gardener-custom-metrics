@@ -17,7 +17,7 @@
 set -e
 
 PACKAGE_PATH="${1:-k8s.io/component-base}"
-VERSION_PATH="${2:-$(dirname $0)/../../VERSION}"
+VERSION_PATH="${2:-$(dirname $0)/../VERSION}"
 PROGRAM_NAME="${3:-Gardener}"
 BUILD_DATE="${4:-$(date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([0-9][0-9]\)$/:\1/g')}"
 VERSION_VERSIONFILE="$(cat "$VERSION_PATH")"

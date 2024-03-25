@@ -25,11 +25,11 @@ ifneq ($(strip $(shell git status --porcelain 2>/dev/null)),)
 endif
 
 # In debug, do not use the -w flag. It strips useful debug information.
-LD_FLAGS := "-w $(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME))"
-LD_FLAGS_DEBUG := "$(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME))"
+LD_FLAGS := "-w $(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/third_party/gardener/gardener/hack/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME))"
+LD_FLAGS_DEBUG := "$(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/third_party/gardener/gardener/hack/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME))"
 
-TOOLS_DIR := $(REPO_ROOT)/hack/gardener-util/tools
-include $(REPO_ROOT)/hack/gardener-util/tools.mk
+TOOLS_DIR := $(REPO_ROOT)/hack/tools
+include $(REPO_ROOT)/third_party/gardener/gardener/hack/tools.mk
 
 #########################################
 # Rules for local development scenarios #
@@ -62,7 +62,7 @@ start:
 # Installs the binary. Used by docker build
 .PHONY: install
 install:
-	@LD_FLAGS=$(LD_FLAGS) $(REPO_ROOT)/hack/gardener-util/install.sh ./...
+	@LD_FLAGS=$(LD_FLAGS) $(REPO_ROOT)/third_party/gardener/gardener/hack/install.sh ./...
 
 .PHONY: docker-login
 docker-login:
@@ -90,38 +90,38 @@ revendor:
 
 .PHONY: clean
 clean:
-	@$(REPO_ROOT)/hack/gardener-util/clean.sh ./cmd/... ./pkg/... ./test/...
+	@$(REPO_ROOT)/third_party/gardener/gardener/hack/clean.sh ./cmd/... ./pkg/...
 
 .PHONY: check-generate
 check-generate:
 	echo "Code generation is currently not implemented"
-	# @$(REPO_ROOT)/hack/gardener-util/check-generate.sh $(REPO_ROOT)
+	# @$(REPO_ROOT)/third_party/gardener/gardener/hack/check-generate.sh $(REPO_ROOT)
 
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(HELM)
-	@$(REPO_ROOT)/hack/gardener-util/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
+	@$(REPO_ROOT)/third_party/gardener/gardener/hack/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
 
 .PHONY: generate
 generate: $(CONTROLLER_GEN) $(GEN_CRD_API_REFERENCE_DOCS) $(HELM) $(YQ)
 	echo "Code generation is currently not implemented"
-	# @$(REPO_ROOT)/hack/gardener-util/generate.sh ./cmd/... ./pkg/... ./test/...
+	# @$(REPO_ROOT)/third_party/gardener/gardener/hack/generate.sh ./cmd/... ./pkg/...
 	# $(MAKE) format
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
-	@$(REPO_ROOT)/hack/gardener-util/format.sh ./cmd ./pkg
+	@$(REPO_ROOT)/third_party/gardener/gardener/hack/format.sh ./cmd ./pkg
 
 .PHONY: test
 test: $(REPORT_COLLECTOR)
-	@$(REPO_ROOT)/hack/gardener-util/test.sh ./cmd/... ./pkg/...
+	@$(REPO_ROOT)/third_party/gardener/gardener/hack/test.sh ./cmd/... ./pkg/...
 
 .PHONY: test-cov
 test-cov:
-	@$(REPO_ROOT)/hack/gardener-util/test-cover.sh ./cmd/... ./pkg/...
+	@$(REPO_ROOT)/third_party/gardener/gardener/hack/test-cover.sh ./cmd/... ./pkg/...
 
 .PHONY: test-clean
 test-clean:
-	@$(REPO_ROOT)/hack/gardener-util/test-cover-clean.sh
+	@$(REPO_ROOT)/third_party/gardener/gardener/hack/test-cover-clean.sh
 
 .PHONY: verify
 verify: check format test

@@ -16,18 +16,8 @@
 // limitations under the License.
 
 // This package imports things required by build scripts, to force `go mod` to see them as dependencies
-package gardener_util
+package tools
 
 import (
-	//_ "github.com/ahmetb/gen-crd-api-reference-docs"
-	//_ "github.com/bronze1man/yaml2json"
-	//_ "github.com/golang/mock/mockgen"
-	//_ "github.com/onsi/ginkgo/v2/ginkgo"
 	_ "golang.org/x/tools/cmd/goimports"
-	//_ "k8s.io/code-generator"
-	//_ "k8s.io/code-generator/cmd/go-to-protobuf/protoc-gen-gogo"
-	//_ "k8s.io/code-generator/cmd/import-boss"
-	//_ "k8s.io/kube-openapi/cmd/openapi-gen"
-	//_ "sigs.k8s.io/controller-runtime/tools/setup-envtest"
-	//_ "sigs.k8s.io/controller-tools/cmd/controller-gen"
 )

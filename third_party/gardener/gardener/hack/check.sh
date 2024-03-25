@@ -16,10 +16,32 @@
 
 set -e
 
-echo "> Install"
+GOLANGCI_LINT_CONFIG_FILE=""
 
-LD_FLAGS="${LD_FLAGS:-$($(dirname $0)/get-build-ld-flags.sh)}"
+for arg in "$@"; do
+  case $arg in
+    --golangci-lint-config=*)
+    GOLANGCI_LINT_CONFIG_FILE="-c ${arg#*=}"
+    shift
+    ;;
+  esac
+done
 
-CGO_ENABLED=0 GOOS=$(go env GOOS) GOARCH=$(go env GOARCH) GO111MODULE=on \
-  go install -mod=vendor -ldflags "$LD_FLAGS" \
-  $@
+echo "> Check"
+
+echo "Executing golangci-lint"
+golangci-lint run $GOLANGCI_LINT_CONFIG_FILE --timeout 10m $@
+
+echo "Executing gofmt/goimports"
+folders=()
+for f in "$@"; do
+  folders+=( "$(echo $f | sed 's/\.\.\.//')" )
+done
+unformatted_files="$(goimports -l ${folders[*]})"
+if [[ "$unformatted_files" ]]; then
+  echo "Unformatted files detected:"
+  echo "$unformatted_files"
+  exit 1
+fi
+
+echo "All checks successful"

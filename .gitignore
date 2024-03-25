@@ -5,7 +5,7 @@
 /.vscode/
 /bin/
 /dev/
-/hack/gardener-util/tools/bin/
+/hack/tools/bin
 /local/
 /tmp/
 **/dev
