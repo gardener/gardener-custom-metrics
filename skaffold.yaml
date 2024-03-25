@@ -12,7 +12,6 @@ build:
             - cmd/**
             - example/**
             - pkg/**
-            - vendor/**
             - VERSION
         ldflags:
           - '{{.LD_FLAGS}}'

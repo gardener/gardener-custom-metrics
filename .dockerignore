@@ -12,7 +12,6 @@
 !pkg/
 !test/
 !third_party/
-!vendor/
 
 !.gitignore
 !.golangci.yaml

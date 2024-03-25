@@ -38,9 +38,8 @@ include $(REPO_ROOT)/third_party/gardener/gardener/hack/tools.mk
 .PHONY: start
 start:
 	@LEADER_ELECTION_NAMESPACE=garden GO111MODULE=on go run \
-		-mod=vendor \
 		-ldflags $(LD_FLAGS) \
-		./cmd \
+		./cmd/gardener-custom-metrics \
 		--secure-port=6443 \
 		--lister-kubeconfig=$(REPO_ROOT)/dev/kubeconfig.yaml \
 		--authentication-kubeconfig=$(REPO_ROOT)/dev/kubeconfig.yaml \
@@ -83,10 +82,9 @@ docker-push:
 # Rules for verification, formatting, linting, testing and cleaning #
 #####################################################################
 
-.PHONY: revendor
-revendor:
+.PHONY: tidy
+tidy:
 	@GO111MODULE=on go mod tidy
-	@GO111MODULE=on go mod vendor
 
 .PHONY: clean
 clean:
