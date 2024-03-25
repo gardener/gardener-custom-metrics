@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Gardener contributors
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Package input_data_registry holds application metrics from shoot kube-apiserver (Kapi) pods and
 // information necessary to scrape such metrics.
 package input_data_registry

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Gardener contributors
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Package metrics_provider implements a custom metrics server which exposes shoot kube-apiserver pod data available
 // in a [input_data_registry.InputDataSource].
 package metrics_provider
