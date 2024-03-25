@@ -46,7 +46,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			scraper.testIsolation.NewMetricsClient = func() metricsClient {
 				return fakeClient
 			}
-			scraper.testIsolation.workerProc = func(ctx context.Context) {
+			scraper.testIsolation.workerProc = func(_ context.Context) {
 				clientMetrics.WorkerProcCount.Add(1)
 				scraper.workerWaitGroup.Done()
 				scraper.activeWorkerCount.Add(-1)
@@ -130,7 +130,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			var isRunning atomic.Bool
-			scraper.testIsolation.workerProc = func(ctx context.Context) {
+			scraper.testIsolation.workerProc = func(_ context.Context) {
 				isRunning.Store(true)
 				scraper.workerWaitGroup.Done()
 				scraper.activeWorkerCount.Add(-1)
@@ -170,7 +170,7 @@ var _ = Describe("input.metrics_scraper.Scraper", func() {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			var isRunning atomic.Bool
-			scraper.testIsolation.workerProc = func(ctx context.Context) {
+			scraper.testIsolation.workerProc = func(_ context.Context) {
 				isRunning.Store(true)
 			}
 

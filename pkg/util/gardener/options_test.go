@@ -36,7 +36,7 @@ var _ = Describe("RESTOptions", func() {
 				output.ForwardedKubeconfig = inCluster
 				return nil, nil
 			},
-			OsGetenv: func(key string) string {
+			OsGetenv: func(_ string) string {
 				return envKubeconfig
 			},
 		}

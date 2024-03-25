@@ -61,7 +61,7 @@ func getRootCommand() *cobra.Command {
 	appOptions.AddFlags(cmd.Flags())
 	cmd.Flags().AddGoFlagSet(flag.CommandLine) // Make sure we get the klog flags
 
-	cmd.Run = func(cmd *cobra.Command, args []string) {
+	cmd.Run = func(_ *cobra.Command, _ []string) {
 		runApplication(inputCLIOptions, metricsProviderService, appOptions)
 	}
 
@@ -198,7 +198,7 @@ func getVersionCommand() *cobra.Command {
 		cmd = &cobra.Command{
 			Use:  "version",
 			Long: "Get detailed version and build information",
-			Run: func(cmd *cobra.Command, args []string) {
+			Run: func(_ *cobra.Command, _ []string) {
 				fmt.Println(version.Get())
 			},
 		}

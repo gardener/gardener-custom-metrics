@@ -91,7 +91,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 		newTestMetricsClient = func(responseBody interface{}) (*metricsClientImpl, *fakeHttpClient) {
 			metricsClient := newMetricsClient().(*metricsClientImpl)
 			httpClient := newFakeHttpClient(responseBody)
-			metricsClient.testIsolation.NewHttpClient = func(caCertificates *x509.CertPool) rest.HTTPClient {
+			metricsClient.testIsolation.NewHttpClient = func(_ *x509.CertPool) rest.HTTPClient {
 				return httpClient
 			}
 			return metricsClient, httpClient
