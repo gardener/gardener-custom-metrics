@@ -13,16 +13,16 @@ require (
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.9.3
-	k8s.io/api v0.23.17 // v0.24.0 // v0.24.4
-	k8s.io/apimachinery v0.23.17 // v0.24.0 // v0.24.4
-	k8s.io/apiserver v0.23.17 // v0.24.4
+	k8s.io/api v0.23.17
+	k8s.io/apimachinery v0.23.17
+	k8s.io/apiserver v0.23.17
 	k8s.io/client-go v0.23.17
-	k8s.io/component-base v0.23.17 // v0.24.0 // v0.24.4
-	k8s.io/kube-openapi v0.0.0-20220124234850-424119656bbf // v0.0.0-20220124234850-424119656bbf // v0.0.0-20220328201542-3ee0da9b0b42
-	k8s.io/metrics v0.23.17 // v0.24.4
+	k8s.io/component-base v0.23.17
+	k8s.io/kube-openapi v0.0.0-20220124234850-424119656bbf
+	k8s.io/metrics v0.23.17
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
-	sigs.k8s.io/controller-runtime v0.11.2 // v0.12.1
-	sigs.k8s.io/custom-metrics-apiserver v1.23.0 // v1.22.0 // v1.23.0
+	sigs.k8s.io/controller-runtime v0.11.2
+	sigs.k8s.io/custom-metrics-apiserver v1.23.0
 )
 
 require (
