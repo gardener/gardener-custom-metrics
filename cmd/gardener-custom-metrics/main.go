@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/component-base/logs"
+	"k8s.io/component-base/version"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	kmgr "sigs.k8s.io/controller-runtime/pkg/manager"
@@ -21,7 +22,6 @@ import (
 	"github.com/gardener/gardener-custom-metrics/pkg/metrics_provider"
 	gutil "github.com/gardener/gardener-custom-metrics/pkg/util/gardener"
 	k8sclient "github.com/gardener/gardener-custom-metrics/pkg/util/k8s/client"
-	"github.com/gardener/gardener-custom-metrics/pkg/version"
 )
 
 func main() {
@@ -79,7 +79,7 @@ func completeAppCLIOptions(
 
 	// Create log
 	log := initLogs(ctx, appOptions.Completed().LogLevel)
-	log.V(app.VerbosityInfo).Info("Initializing", "version", version.Version)
+	log.V(app.VerbosityInfo).Info("Initializing", "version", version.Get().GitVersion)
 
 	// Create manager
 	log.V(app.VerbosityInfo).Info("Creating client set")
