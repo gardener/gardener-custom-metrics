@@ -12,27 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BUILD_DATE := $(shell date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([0-9][0-9]\)$$/:\1/g')
+BUILD_DATE                  := $(shell date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([0-9][0-9]\)$$/:\1/g')
 NAME                        := gardener-custom-metrics
 IMAGE_REGISTRY_URI          := eu.gcr.io/gardener-project/gardener
 REPO_ROOT                   := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 VERSION                     := $(shell cat "$(REPO_ROOT)/VERSION")
 EFFECTIVE_VERSION           := $(VERSION)-$(shell git rev-parse HEAD)
-LD_FLAGS                    := "-w -X github.com/gardener/$(NAME)/pkg/version.Version=$(VERSION) -X github.com/gardener/$(NAME)/pkg/version.GitCommit=$(shell git rev-parse --verify HEAD) -X github.com/gardener/$(NAME)/pkg/version.BuildDate=$(shell date --rfc-3339=seconds | sed 's/ /T/')"
 LEADER_ELECTION             := false
-PARALLEL_E2E_TESTS          := 2
-
-ifndef ARTIFACTS
-	export ARTIFACTS=/tmp/artifacts
-endif
 
 ifneq ($(strip $(shell git status --porcelain 2>/dev/null)),)
 	EFFECTIVE_VERSION := $(EFFECTIVE_VERSION)-dirty
 endif
 
 # In debug, do not use the -w flag. It strips useful debug information.
-LD_FLAGS := "-w $(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(EXTENSION_PREFIX)-$(NAME))"
-LD_FLAGS_DEBUG := "$(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(EXTENSION_PREFIX)-$(NAME))"
+LD_FLAGS := "-w $(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME))"
+LD_FLAGS_DEBUG := "$(shell EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) $(REPO_ROOT)/hack/gardener-util/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME))"
 
 TOOLS_DIR := $(REPO_ROOT)/hack/gardener-util/tools
 include $(REPO_ROOT)/hack/gardener-util/tools.mk
@@ -103,10 +97,6 @@ check-generate:
 	echo "Code generation is currently not implemented"
 	# @$(REPO_ROOT)/hack/gardener-util/check-generate.sh $(REPO_ROOT)
 
-.PHONY: check-docforge
-check-docforge: $(DOCFORGE)
-	@$(REPO_ROOT)/hack/gardener-util/check-docforge.sh $(REPO_ROOT) $(REPO_ROOT)/.docforge/manifest.yaml ".docforge/;docs/" $(NAME) false
-
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(HELM)
 	@$(REPO_ROOT)/hack/gardener-util/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
@@ -119,7 +109,7 @@ generate: $(CONTROLLER_GEN) $(GEN_CRD_API_REFERENCE_DOCS) $(HELM) $(YQ)
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
-	@$(REPO_ROOT)/hack/gardener-util/format.sh ./cmd ./pkg ./test
+	@$(REPO_ROOT)/hack/gardener-util/format.sh ./cmd ./pkg
 
 .PHONY: test
 test: $(REPORT_COLLECTOR)
@@ -134,10 +124,10 @@ test-clean:
 	@$(REPO_ROOT)/hack/gardener-util/test-cover-clean.sh
 
 .PHONY: verify
-verify: check check-docforge format test
+verify: check format test
 
 .PHONY: verify-extended
-verify-extended: check-generate check check-docforge format test test-cov test-clean
+verify-extended: check-generate check format test-cov test-clean
 
 # skaffold dev and debug clean up deployed modules by default, disable this
 debug: export SKAFFOLD_CLEANUP = false

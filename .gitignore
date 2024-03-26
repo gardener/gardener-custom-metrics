@@ -14,14 +14,6 @@
 # Build output
 /main
 
-# By extension ################################################################
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
 # Test binary, built with `go test -c`
 *.test
 
@@ -31,6 +23,8 @@
 *.coverprofile
 *.html
 *~
+
+TODO
 
 # Virtual go & fuse
 .virtualgo

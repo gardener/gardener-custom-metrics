@@ -128,6 +128,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(ContainSubstring(http.Err.Error()))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when the HTTP call returns HTTP error code", func() {
 			// Arrange
 			mc, http := newTestMetricsClient("")
@@ -141,6 +142,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(ContainSubstring(fmt.Sprint(http.Response.StatusCode)))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when the HTTP response is empty", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient("")
@@ -153,6 +155,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*no.*counters.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when the HTTP response payload is binary and not text data", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient([]byte{1, 5, 10, 20, 40, 80, 160})
@@ -164,6 +167,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).NotTo(BeNil())
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when the HTTP response is missing the RPS metric", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(""))
@@ -176,6 +180,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*no.*counters.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should succeed when an RPS metric line has a positive int32 value", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"} 5678\n")))
@@ -187,6 +192,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(5678)))
 		})
+
 		It("should sum up all RPS metric counters", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody(
@@ -201,6 +207,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(31)))
 		})
+
 		It("should succeed when an RPS metric line has a negative int64 value which does not fit in int32", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"} -10000000000\n")))
@@ -212,6 +219,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(-10 * 1000 * 1000 * 1000)))
 		})
+
 		It("should succeed when an RPS metric line has a floating point value which corresponds to an integer", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"} 1.0056e4\n")))
@@ -223,6 +231,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(10056)))
 		})
+
 		It("should succeed when an RPS metric line has no series identifier", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total 15\n")))
@@ -234,6 +243,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(15)))
 		})
+
 		It("should succeed if an RPS metric line has whitespace between the metric name and the series identifier", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total \t{code=\"200\"} 15\n")))
@@ -245,6 +255,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(15)))
 		})
+
 		It("should return an error and zero value when an RPS metric line has unterminated series identifier", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\" 15\n")))
@@ -257,6 +268,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*malformed.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when an RPS metric line is missing the value", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"}\n")))
@@ -269,6 +281,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*malformed.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when an RPS metric line has a value which is not a number", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"} BadValue\n")))
@@ -281,6 +294,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*malformed.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when an RPS metric line has a floating point value which does not correspond to an integer", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"} 1.5\n")))
@@ -293,6 +307,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*malformed.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when an RPS metric line has an integer value which does not fit in int64", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"} 99999999999999999999\n")))
@@ -305,6 +320,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*malformed.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should return an error and zero value when an RPS metric line contains a zero byte", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total\x00{code=\"200\"} 15\n")))
@@ -317,6 +333,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err.Error()).To(MatchRegexp(".*malformed.*"))
 			Expect(result).To(BeZero())
 		})
+
 		It("should ignore empty lines", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody(newResponseBody("\n\napiserver_request_total{code=\"200\"} 15\n")))
@@ -328,6 +345,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(15)))
 		})
+
 		It("should attempt to parse the response as plaintext metrics, when the HTTP response has unexpected content encoding", func() {
 			// Arrange
 			mc, http := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\"} 15\n")))
@@ -340,6 +358,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(15)))
 		})
+
 		It("should succeed when the HTTP response payload starts with a comment", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody("# HELP abc\napiserver_request_total{code=\"200\"} 15\n"))
@@ -351,6 +370,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(15)))
 		})
+
 		It("should succeed when the HTTP response payload does not start with a comment", func() {
 			// Arrange
 			mc, _ := newTestMetricsClient(newResponseBody("apiserver_request_total{code=\"200\"} 15\n"))
@@ -362,6 +382,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(15)))
 		})
+
 		It("should succeed when the HTTP response is gzip compressed", func() {
 			// Arrange
 			gzipBytes, err := os.ReadFile("testdata/metrics-response-sample.gz")
@@ -376,7 +397,8 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(15)))
 		})
-		It("should process correctly a 100MB plain text HTTP response", func() {
+
+		It("should process correctly a 19.38MB (< 20MiB) plain text HTTP response", func() {
 			// Arrange
 			var commentBuilder strings.Builder
 			commentBuilder.Grow(100 * 1000)
@@ -387,7 +409,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			comment := commentBuilder.String()
 
 			var responseBuilder strings.Builder
-			for i := 0; i < 1000; i++ {
+			for i := 0; i < 190; i++ {
 				responseBuilder.WriteString(comment)
 			}
 
@@ -404,6 +426,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(err).To(BeNil())
 			Expect(result).To(Equal(int64(2 * counterCount)))
 		})
+
 		It("when failing, should close the response stream", func() {
 			// Arrange
 			mc, http := newTestMetricsClient(newResponseBody(newResponseBody("apiserver_request_total{code=\"200\" 15\n")))
@@ -426,6 +449,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			// Assert
 			Expect(http.ResposeBodyReader.IsClosed).To(BeTrue())
 		})
+
 		It("should pass the correct parameters to the HTTP requests it makes", func() {
 			// Arrange
 			mc, http := newTestMetricsClient("")
@@ -439,6 +463,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(http.Request.URL.Path).To(Equal("/metrics"))
 			Expect(http.Request.Header["Authorization"]).To(Equal([]string{"Bearer " + authSecret}))
 		})
+
 		It("should pass the specified context to the HTTP client, so it can abort work when context is cancelled", func() {
 			// Arrange
 			mc, http := newTestMetricsClient("")
@@ -454,6 +479,7 @@ var _ = Describe("input.metrics_scraper.metricsClientImpl", func() {
 			Expect(http.Request.Context().Err()).ToNot(BeNil())
 		})
 	})
+
 	Describe("newMetricsClient", func() {
 		It("should return a client which uses specified cert pool for HTTP clients it creates", func() {
 			// Arrange

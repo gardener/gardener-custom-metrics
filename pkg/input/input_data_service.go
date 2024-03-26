@@ -67,14 +67,7 @@ func newInputDataService(cliConfig *CLIConfig, parentLogger logr.Logger) InputDa
 		config:            cliConfig,
 		log:               log,
 		testIsolation: testIsolation{
-			NewScraper: func(
-				dataRegistry input_data_registry.InputDataRegistry,
-				scrapePeriod time.Duration,
-				scrapeFlowControlPeriod time.Duration,
-				log logr.Logger) *metrics_scraper.Scraper {
-
-				return metrics_scraper.NewScraper(dataRegistry, scrapePeriod, scrapeFlowControlPeriod, log)
-			},
+			NewScraper: metrics_scraper.NewScraper,
 		},
 	}
 }

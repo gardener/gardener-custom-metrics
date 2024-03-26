@@ -1,7 +1,9 @@
 // Package errutil provides utilities for error creation and handling
 package errutil
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Wrap wraps an error, adding a prefix to the message.
 //
