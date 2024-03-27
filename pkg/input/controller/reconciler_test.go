@@ -13,13 +13,12 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	kclient "sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-
-	"github.com/gardener/gardener-custom-metrics/pkg/input/controller/test_util"
 )
 
 var _ = Describe("input.controller.reconciler", func() {
@@ -29,26 +28,21 @@ var _ = Describe("input.controller.reconciler", func() {
 	)
 
 	var (
-		newTestReconciler = func() (reconcile.Reconciler, *fakeActuator, *test_util.FakeClient, *corev1.Pod) {
+		ctx = context.Background()
+
+		newTestReconciler = func() (reconcile.Reconciler, *fakeActuator, client.Client, *corev1.Pod) {
 			actuator := &fakeActuator{}
-			client := &test_util.FakeClient{}
-			client.GetFunc = func(_ context.Context, _ kclient.ObjectKey, _ kclient.Object) error {
-				return nil
-			}
+			fakeClient := fake.NewClientBuilder().Build()
 			controlledObjectPrototype := &corev1.Pod{}
-			reconciler := NewReconciler(actuator, controlledObjectPrototype, client, logr.Discard())
-			return reconciler, actuator, client, controlledObjectPrototype
+			reconciler := NewReconciler(actuator, controlledObjectPrototype, fakeClient, logr.Discard())
+			return reconciler, actuator, fakeClient, controlledObjectPrototype
 		}
 	)
 
 	Describe("Reconcile", func() {
 		It("should delegate to the actuator's delete function if the object is missing", func() {
 			// Arrange
-			reconciler, actuator, client, _ := newTestReconciler()
-			client.GetFunc = func(_ context.Context, key kclient.ObjectKey, _ kclient.Object) error {
-				return errors.NewNotFound(schema.GroupResource{}, key.Name)
-			}
-			ctx := context.Background()
+			reconciler, actuator, _, _ := newTestReconciler()
 
 			// Act
 			result, err := reconciler.Reconcile(
@@ -59,12 +53,17 @@ var _ = Describe("input.controller.reconciler", func() {
 			Expect(result.Requeue).To(BeFalse())
 			Expect(int(actuator.CallType)).To(Equal(callTypeDelete))
 		})
-		It("should use a deep copy of the client's prototype objet, not the prototype itself", func() {
+
+		It("should use a deep copy of the client's prototype object, not the prototype itself", func() {
 			// Arrange
-			reconciler, _, _, podPrototype := newTestReconciler()
+			reconciler, _, fakeClient, podPrototype := newTestReconciler()
 			podPrototype.Name = testPodName
-			ctx := context.Background()
 			tempPodName := "temp-name"
+			pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:      tempPodName,
+				Namespace: testNs,
+			}}
+			Expect(fakeClient.Create(ctx, pod)).To(Succeed())
 
 			// Act
 			_, err := reconciler.Reconcile(
@@ -74,12 +73,17 @@ var _ = Describe("input.controller.reconciler", func() {
 			Expect(err).To(Succeed())
 			Expect(podPrototype.Name).To(Equal(testPodName))
 		})
+
 		It("should pass the name and namespace from the request to actuator", func() {
 			// Arrange
-			reconciler, actuator, _, _ := newTestReconciler()
-			ctx := context.Background()
+			reconciler, actuator, fakeClient, _ := newTestReconciler()
 			anotherNamespace := "another-namespace"
 			anotherPodName := "another-name"
+			pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:      anotherPodName,
+				Namespace: anotherNamespace,
+			}}
+			Expect(fakeClient.Create(ctx, pod)).To(Succeed())
 
 			// Act
 			_, err := reconciler.Reconcile(
@@ -90,15 +94,17 @@ var _ = Describe("input.controller.reconciler", func() {
 			Expect(actuator.Obj.GetNamespace()).To(Equal(anotherNamespace))
 			Expect(actuator.Obj.GetName()).To(Equal(anotherPodName))
 		})
+
 		It("should delegate to the actuator's delete function, if the object has a deletion timestamp", func() {
 			// Arrange
-			reconciler, actuator, client, _ := newTestReconciler()
-			client.GetFunc = func(_ context.Context, _ kclient.ObjectKey, obj kclient.Object) error {
-				t := v1.NewTime(time.Now())
-				obj.(*corev1.Pod).DeletionTimestamp = &t
-				return nil
-			}
-			ctx := context.Background()
+			reconciler, actuator, fakeClient, _ := newTestReconciler()
+			pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:       testPodName,
+				Namespace:  testNs,
+				Finalizers: []string{"foo"},
+			}}
+			Expect(fakeClient.Create(ctx, pod)).To(Succeed())
+			Expect(fakeClient.Delete(ctx, pod)).To(Succeed())
 
 			// Act
 			_, err := reconciler.Reconcile(
@@ -108,10 +114,15 @@ var _ = Describe("input.controller.reconciler", func() {
 			Expect(err).To(Succeed())
 			Expect(int(actuator.CallType)).To(Equal(callTypeDelete))
 		})
-		It("should delegate to the actuator's delete function, if the object has a deletion timestamp", func() {
+
+		It("should delegate to the actuator's create or update function, if the object does not have a deletion timestamp", func() {
 			// Arrange
-			reconciler, actuator, _, _ := newTestReconciler()
-			ctx := context.Background()
+			reconciler, actuator, fakeClient, _ := newTestReconciler()
+			pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:      testPodName,
+				Namespace: testNs,
+			}}
+			Expect(fakeClient.Create(ctx, pod)).To(Succeed())
 
 			// Act
 			_, err := reconciler.Reconcile(
@@ -121,13 +132,18 @@ var _ = Describe("input.controller.reconciler", func() {
 			Expect(err).To(Succeed())
 			Expect(int(actuator.CallType)).To(Equal(callTypeCreateOrUpdate))
 		})
+
 		It("should pass the actuator's requeueAfter and error response, to the caller", func() {
 			// Arrange
 			expectedError := errors.NewBadRequest("test error")
-			reconciler, actuator, _, _ := newTestReconciler()
+			reconciler, actuator, fakeClient, _ := newTestReconciler()
+			pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:      testPodName,
+				Namespace: testNs,
+			}}
+			Expect(fakeClient.Create(ctx, pod)).To(Succeed())
 			actuator.RequeueAfter = 1 * time.Minute
 			actuator.Err = expectedError
-			ctx := context.Background()
 
 			// Act
 			result, err := reconciler.Reconcile(
@@ -137,11 +153,16 @@ var _ = Describe("input.controller.reconciler", func() {
 			Expect(err).To(Equal(expectedError))
 			Expect(result.RequeueAfter).To(Equal(1 * time.Minute))
 		})
+
 		It("should pass the actuator's requeueAfter to the caller, even if error is nil", func() {
 			// Arrange
-			reconciler, actuator, _, _ := newTestReconciler()
+			reconciler, actuator, fakeClient, _ := newTestReconciler()
+			pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:      testPodName,
+				Namespace: testNs,
+			}}
+			Expect(fakeClient.Create(ctx, pod)).To(Succeed())
 			actuator.RequeueAfter = 2 * time.Minute
-			ctx := context.Background()
 
 			// Act
 			result, err := reconciler.Reconcile(
