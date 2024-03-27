@@ -67,7 +67,7 @@ func (factory *Factory) AddNewControllerToManager(mgr manager.Manager, args AddA
 	}
 
 	// Add primary watch
-	if err := controller.Watch(&source.Kind{Type: args.ControlledObjectType}, &handler.EnqueueRequestForObject{}, args.Predicates...); err != nil {
+	if err := controller.Watch(source.Kind(mgr.GetCache(), args.ControlledObjectType), &handler.EnqueueRequestForObject{}, args.Predicates...); err != nil {
 		return fmt.Errorf("setup primary watch for controller %s: %w", args.ControllerName, err)
 	}
 
