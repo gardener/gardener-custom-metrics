@@ -16,7 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/metrics/pkg/apis/custom_metrics"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/custom-metrics-apiserver/pkg/provider"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/input/input_data_registry"
@@ -164,7 +164,7 @@ func (mp *MetricsProvider) getMetricByPredicate(
 			},
 			Value:         *resource.NewMilliQuantity(int64(requestRate*1000), resource.DecimalSI),
 			Timestamp:     metav1.Time{Time: kapi.MetricsTimeNew()},
-			WindowSeconds: pointer.Int64(int64(math.Round(gap.Seconds()))),
+			WindowSeconds: ptr.To(int64(math.Round(gap.Seconds()))),
 		})
 	}
 
