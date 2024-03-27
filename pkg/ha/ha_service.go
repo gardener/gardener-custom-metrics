@@ -13,8 +13,8 @@ import (
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	ctlmgr "sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
 	"github.com/gardener/gardener-custom-metrics/pkg/util/errutil"
@@ -27,7 +27,8 @@ import (
 // For information about individual fields, see NewHAService().
 type HAService struct {
 	log              logr.Logger
-	manager          ctlmgr.Manager
+	apiReader        client.Reader
+	client           client.Client
 	namespace        string
 	servingIPAddress string
 	servingPort      int
@@ -43,7 +44,9 @@ type testIsolation struct {
 
 // NewHAService creates a new HAService instance.
 //
-// manager is the [ctlmgr.Manager] instance which orchestrates the leader election process upon which HA operation relies.
+// apiReader is the client.Reader used to fetch the Endpoints object.
+//
+// client is the client.Client used to update the Endpoints object.
 //
 // namespace is the K8s namespace in which this process and associated artefacts belong.
 //
@@ -51,11 +54,12 @@ type testIsolation struct {
 //
 // servingPort is the network port at which custom metrics from this process can be consumed.
 func NewHAService(
-	manager ctlmgr.Manager, namespace string, servingIPAddress string, servingPort int, parentLogger logr.Logger) *HAService {
+	apiReader client.Reader, client client.Client, namespace string, servingIPAddress string, servingPort int, parentLogger logr.Logger) *HAService {
 
 	return &HAService{
 		log:              parentLogger.WithName("ha"),
-		manager:          manager,
+		apiReader:        apiReader,
+		client:           client,
 		namespace:        namespace,
 		servingIPAddress: servingIPAddress,
 		servingPort:      servingPort,
@@ -64,16 +68,16 @@ func NewHAService(
 }
 
 func (ha *HAService) setEndpoints(ctx context.Context) error {
-	endpoints := corev1.Endpoints{}
+	endpoints := corev1.Endpoints{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      app.Name,
+			Namespace: ha.namespace,
+		},
+	}
 	// Bypass client cache to avoid triggering a cluster wide list-watch for Endpoints - our RBAC does not allow it
-	err := ha.manager.GetAPIReader().Get(ctx, client.ObjectKey{Namespace: ha.namespace, Name: app.Name}, &endpoints)
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			return fmt.Errorf("updating the service endpoint to point to the new leader: retrieving endpoints: %w", err)
-		}
-
-		endpoints.ObjectMeta.Namespace = ha.namespace
-		endpoints.ObjectMeta.Name = app.Name
+	err := ha.apiReader.Get(ctx, client.ObjectKeyFromObject(&endpoints), &endpoints)
+	if err != nil && !errors.IsNotFound(err) {
+		return fmt.Errorf("updating the service endpoint to point to the new leader: retrieving endpoints: %w", err)
 	}
 
 	endpoints.ObjectMeta.Labels = map[string]string{"app": app.Name}
@@ -82,7 +86,7 @@ func (ha *HAService) setEndpoints(ctx context.Context) error {
 		Ports:     []corev1.EndpointPort{{Port: int32(ha.servingPort), Protocol: "TCP"}},
 	}}
 
-	err = ha.manager.GetClient().Update(ctx, &endpoints)
+	err = ha.client.Update(ctx, &endpoints)
 	return errutil.Wrap("updating the service endpoint to point to the new leader", err)
 }
 

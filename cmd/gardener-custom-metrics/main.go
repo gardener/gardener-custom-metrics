@@ -91,15 +91,15 @@ func completeAppCLIOptions(
 		return &log, nil, nil, fmt.Errorf("create client set: %w", err)
 	}
 	log.V(app.VerbosityVerbose).Info("Creating controller manager")
-	manager, err := kmgr.New(appOptions.RestOptions.Completed().Config, appOptions.Completed().ManagerOptions())
+	mgr, err := kmgr.New(appOptions.RestOptions.Completed().Config, appOptions.Completed().ManagerOptions())
 	if err != nil {
 		return &log, nil, nil, fmt.Errorf("creating controller manager: %w", err)
 	}
 
 	// Create HA service
-	haService := ha.NewHAService(manager, appOptions.Namespace, appOptions.AccessIPAddress, appOptions.AccessPort, log)
+	haService := ha.NewHAService(mgr.GetAPIReader(), mgr.GetClient(), appOptions.Namespace, appOptions.AccessIPAddress, appOptions.AccessPort, log)
 
-	return &log, manager, haService, nil
+	return &log, mgr, haService, nil
 }
 
 // completeInputServiceCLIOptions completes initialisation based on CLI options related to input data processing.
