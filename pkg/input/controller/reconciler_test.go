@@ -29,7 +29,7 @@ var _ = Describe("input.controller.reconciler", func() {
 		newTestReconciler = func() (reconcile.Reconciler, *fakeActuator, *test_util.FakeClient, *corev1.Pod) {
 			actuator := &fakeActuator{}
 			client := &test_util.FakeClient{}
-			client.GetFunc = func(ctx context.Context, key kclient.ObjectKey, obj kclient.Object) error {
+			client.GetFunc = func(_ context.Context, _ kclient.ObjectKey, _ kclient.Object) error {
 				return nil
 			}
 			controlledObjectPrototype := &corev1.Pod{}
@@ -90,7 +90,7 @@ var _ = Describe("input.controller.reconciler", func() {
 		It("should delegate to the actuator's delete function, if the object has a deletion timestamp", func() {
 			// Arrange
 			reconciler, actuator, client, _ := newTestReconciler()
-			client.GetFunc = func(_ context.Context, key kclient.ObjectKey, obj kclient.Object) error {
+			client.GetFunc = func(_ context.Context, _ kclient.ObjectKey, obj kclient.Object) error {
 				t := v1.NewTime(time.Now())
 				obj.(*corev1.Pod).DeletionTimestamp = &t
 				return nil

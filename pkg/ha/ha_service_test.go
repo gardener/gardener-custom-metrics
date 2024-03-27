@@ -106,7 +106,7 @@ var _ = Describe("HAService", func() {
 			ha := NewHAService(manager, testNs, testIPAddress, testPort, logr.Discard())
 
 			timeAfterChan := make(chan time.Time)
-			ha.testIsolation.TimeAfter = func(duration time.Duration) <-chan time.Time {
+			ha.testIsolation.TimeAfter = func(_ time.Duration) <-chan time.Time {
 				return timeAfterChan
 			}
 

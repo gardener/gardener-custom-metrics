@@ -1,11 +1,10 @@
 # Directories #################################################################
 /.secrets/
-/.DS_Store/
 /.idea/
 /.vscode/
 /bin/
 /dev/
-/hack/gardener-util/tools/bin/
+/hack/tools/bin
 /local/
 /tmp/
 **/dev
@@ -22,6 +21,7 @@
 
 *.coverprofile
 *.html
+.DS_Store
 *~
 
 TODO

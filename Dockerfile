@@ -2,7 +2,14 @@
 FROM golang:1.22.1 AS builder
 
 WORKDIR /go/src/github.com/gardener/gardener-custom-metrics
+
+# cache deps before building and copying source so that we don't need to re-download as much
+# and so that source changes don't invalidate our downloaded layer
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
+
 RUN make install
 
 ############# gardener-custom-metrics

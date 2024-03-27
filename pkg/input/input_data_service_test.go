@@ -111,9 +111,9 @@ var _ = Describe("input.inputDataService", func() {
 			var registryPassedToScraperConstructor input_data_registry.InputDataRegistry
 			ids.testIsolation.NewScraper = func(
 				dataRegistry input_data_registry.InputDataRegistry,
-				scrapePeriod time.Duration,
-				scrapeFlowControlPeriod time.Duration,
-				log logr.Logger) *metrics_scraper.Scraper {
+				_ time.Duration,
+				_ time.Duration,
+				_ logr.Logger) *metrics_scraper.Scraper {
 
 				registryPassedToScraperConstructor = dataRegistry
 
@@ -137,10 +137,10 @@ var _ = Describe("input.inputDataService", func() {
 			var scrapeFlowControlPeriodPassedToScraperConstructor time.Duration
 
 			ids.testIsolation.NewScraper = func(
-				dataRegistry input_data_registry.InputDataRegistry,
+				_ input_data_registry.InputDataRegistry,
 				scrapePeriod time.Duration,
 				scrapeFlowControlPeriod time.Duration,
-				log logr.Logger) *metrics_scraper.Scraper {
+				_ logr.Logger) *metrics_scraper.Scraper {
 
 				scrapePeriodPassedToScraperConstructor = scrapePeriod
 				scrapeFlowControlPeriodPassedToScraperConstructor = scrapeFlowControlPeriod

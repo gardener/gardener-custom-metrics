@@ -11,8 +11,7 @@
 !hack/
 !pkg/
 !test/
-!hack/gardener-util/tools/
-!vendor/
+!third_party/
 
 !.gitignore
 !.golangci.yaml
