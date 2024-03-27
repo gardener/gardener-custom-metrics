@@ -13,7 +13,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
 )
@@ -23,16 +22,16 @@ type reconciler struct {
 	actuator                  Actuator      // The actual work gets delegated to this actuator
 	controlledObjectPrototype client.Object // A prototype instance representing the type of objects reconciled by this reconciler
 	client                    client.Client // The k8s client to be used by the reconciler
-	reader                    client.Reader // The k8s reader to be used by the reconciler
 	log                       logr.Logger
 }
 
 // NewReconciler creates a new Reconciler which delegates the real work to the specified Actuator.
-func NewReconciler(actuator Actuator, controlledObjectPrototype client.Object, log logr.Logger) reconcile.Reconciler {
+func NewReconciler(actuator Actuator, controlledObjectPrototype client.Object, client client.Client, log logr.Logger) reconcile.Reconciler {
 	log.V(app.VerbosityVerbose).Info("Creating reconciler")
 	return &reconciler{
 		actuator:                  actuator,
 		controlledObjectPrototype: controlledObjectPrototype,
+		client:                    client,
 		log:                       log,
 	}
 }
@@ -71,26 +70,3 @@ func (r *reconciler) Reconcile(ctx context.Context, request reconcile.Request) (
 
 	return reconcile.Result{RequeueAfter: requeueAfter}, err
 }
-
-//#region Injector methods
-
-// InjectFunc implements controller runtime's Injector interface
-func (r *reconciler) InjectFunc(f inject.Func) error {
-	return f(r.actuator)
-}
-
-// InjectClient implements controller runtime's inject.Client interface to enable the ControllerManager injecting a
-// client into the reconciler
-func (r *reconciler) InjectClient(client client.Client) error {
-	r.client = client
-	return nil
-}
-
-// InjectAPIReader implements controller runtime's inject.APIReader interface to enable the ControllerManager injecting
-// an API reader into the reconciler
-func (r *reconciler) InjectAPIReader(reader client.Reader) error {
-	r.reader = reader
-	return nil
-}
-
-//#endregion Injector methods

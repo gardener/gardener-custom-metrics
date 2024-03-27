@@ -56,12 +56,12 @@ func NewControllerFactory() *Factory {
 }
 
 // AddNewControllerToManager creates a new controller and adds it to the specified manager, using the specified args.
-func (factory *Factory) AddNewControllerToManager(manager manager.Manager, args AddArgs) error {
+func (factory *Factory) AddNewControllerToManager(mgr manager.Manager, args AddArgs) error {
 	args.ControllerOptions.Reconciler =
-		NewReconciler(args.Actuator, args.ControlledObjectType, log.Log.WithName(args.ControllerName))
+		NewReconciler(args.Actuator, args.ControlledObjectType, mgr.GetClient(), log.Log.WithName(args.ControllerName))
 
 	// Create controller
-	controller, err := factory.newController(args.ControllerName, manager, args.ControllerOptions)
+	controller, err := factory.newController(args.ControllerName, mgr, args.ControllerOptions)
 	if err != nil {
 		return fmt.Errorf("create controller %s: %w", args.ControllerName, err)
 	}

@@ -18,7 +18,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	kclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/input/controller/test_util"
 )
@@ -37,8 +36,7 @@ var _ = Describe("input.controller.reconciler", func() {
 				return nil
 			}
 			controlledObjectPrototype := &corev1.Pod{}
-			reconciler := NewReconciler(actuator, controlledObjectPrototype, logr.Discard())
-			reconciler.(inject.Client).InjectClient(client)
+			reconciler := NewReconciler(actuator, controlledObjectPrototype, client, logr.Discard())
 			return reconciler, actuator, client, controlledObjectPrototype
 		}
 	)
