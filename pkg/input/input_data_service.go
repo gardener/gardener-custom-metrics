@@ -106,7 +106,7 @@ func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
 		),
 	}
 	ids.config.PodController.Apply(&podControllerOptions)
-	if err := podctl.AddToManager(manager, ids.inputDataRegistry, podControllerOptions, nil, ids.log.V(1)); err != nil {
+	if err := podctl.AddToManager(manager, ids.inputDataRegistry, podControllerOptions, ids.log.V(1)); err != nil {
 		return fmt.Errorf("add pod controller to manager: %w", err)
 	}
 
@@ -118,7 +118,7 @@ func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
 		),
 	}
 	ids.config.SecretController.Apply(&secretControllerOptions)
-	if err := secretctl.AddToManager(manager, ids.inputDataRegistry, secretControllerOptions, nil, ids.log.V(1)); err != nil {
+	if err := secretctl.AddToManager(manager, ids.inputDataRegistry, secretControllerOptions, ids.log.V(1)); err != nil {
 		return fmt.Errorf("add secret controller to manager: %w", err)
 	}
 

@@ -7,7 +7,6 @@ package pod
 import (
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	kmgr "sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -24,11 +23,10 @@ func AddToManager(
 	manager kmgr.Manager,
 	dataRegistry scrape_target_registry.InputDataRegistry,
 	controllerOptions controller.Options,
-	client client.Client,
 	log logr.Logger) error {
 
 	return gcmctl.NewControllerFactory().AddNewControllerToManager(manager, gcmctl.AddArgs{
-		Actuator:             NewActuator(client, dataRegistry, log.WithName("pod-controller")),
+		Actuator:             NewActuator(dataRegistry, log.WithName("pod-controller")),
 		ControllerName:       app.Name + "-pod-controller",
 		ControllerOptions:    controllerOptions,
 		ControlledObjectType: &corev1.Pod{},
