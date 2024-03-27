@@ -12,12 +12,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/pflag"
-	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
-	genericapiserver "k8s.io/apiserver/pkg/server"
-	customexternalmetrics "sigs.k8s.io/custom-metrics-apiserver/pkg/apiserver"
 	basecmd "sigs.k8s.io/custom-metrics-apiserver/pkg/cmd"
 
-	generatedopenapi "github.com/gardener/gardener-custom-metrics/pkg/api/generated/openapi"
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
 	"github.com/gardener/gardener-custom-metrics/pkg/input/input_data_registry"
 )
@@ -49,16 +45,11 @@ func NewMetricsProviderService() *MetricsProviderService {
 	result := &MetricsProviderService{
 		AdapterBase: basecmd.AdapterBase{
 			Name: adapterName,
-			OpenAPIConfig: genericapiserver.DefaultOpenAPIConfig(
-				generatedopenapi.GetOpenAPIDefinitions,
-				openapinamer.NewDefinitionNamer(customexternalmetrics.Scheme)),
 		},
 		maxSampleAge:  90 * time.Second,
 		maxSampleGap:  600 * time.Second,
 		testIsolation: metricsServiceTestIsolation{NewMetricsProvider: NewMetricsProvider},
 	}
-	result.OpenAPIConfig.Info.Title = adapterName
-	result.OpenAPIConfig.Info.Version = "1.0.0"
 
 	return result
 }
