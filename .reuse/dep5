@@ -19,6 +19,7 @@ Files:
   pkg/api/generated/openapi/openapi.go
   **/testdata/**
   skaffold.yaml
+  third_party/*
 Copyright: 2024 SAP SE or an SAP affiliate company and Gardener contributors
 License: Apache-2.0
 
