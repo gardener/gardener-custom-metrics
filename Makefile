@@ -110,7 +110,7 @@ format: $(GOIMPORTS) $(GOIMPORTSREVISER)
 	@$(REPO_ROOT)/third_party/gardener/gardener/hack/format.sh ./cmd ./pkg
 
 .PHONY: test
-test: $(REPORT_COLLECTOR)
+test:
 	@$(REPO_ROOT)/third_party/gardener/gardener/hack/test.sh ./cmd/... ./pkg/...
 
 .PHONY: test-cov
