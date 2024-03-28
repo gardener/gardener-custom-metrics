@@ -7,6 +7,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -41,15 +42,20 @@ func (r *reconciler) Reconcile(ctx context.Context, request reconcile.Request) (
 	obj := r.controlledObjectPrototype.DeepCopyObject().(client.Object)
 	obj.SetName(request.Name)
 	obj.SetNamespace(request.Namespace)
-	if err := client.IgnoreNotFound(r.client.Get(ctx, request.NamespacedName, obj)); err != nil {
-		return reconcile.Result{}, fmt.Errorf("reconcile: retrieve object from server: %w", err)
+
+	isObjectMissingOnServer := false
+	if err := r.client.Get(ctx, request.NamespacedName, obj); err != nil {
+		if !errors.IsNotFound(err) {
+			return reconcile.Result{}, fmt.Errorf("reconcile: retrieve object from server: %w", err)
+		}
+		isObjectMissingOnServer = true
 	}
 
 	log := r.log.WithValues("name", obj.GetName(), "namespace", obj.GetNamespace())
 
 	var actionName string
 	var actionFunction func(context.Context, client.Object) (time.Duration, error)
-	if obj.GetDeletionTimestamp() != nil {
+	if isObjectMissingOnServer || obj.GetDeletionTimestamp() != nil {
 		actionName = "deletion"
 		actionFunction = r.actuator.Delete
 	} else {
