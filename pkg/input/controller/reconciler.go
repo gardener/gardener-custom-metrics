@@ -7,10 +7,10 @@ package controller
 import (
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"time"
 
 	"github.com/go-logr/logr"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
@@ -43,19 +43,19 @@ func (r *reconciler) Reconcile(ctx context.Context, request reconcile.Request) (
 	obj.SetName(request.Name)
 	obj.SetNamespace(request.Namespace)
 
-	isObjectMissingOnServer := false
+	isObjectMissing := false
 	if err := r.client.Get(ctx, request.NamespacedName, obj); err != nil {
-		if !errors.IsNotFound(err) {
-			return reconcile.Result{}, fmt.Errorf("reconcile: retrieve object from server: %w", err)
+		if !apierrors.IsNotFound(err) {
+			return reconcile.Result{}, fmt.Errorf("error retrieving object from the server: %w", err)
 		}
-		isObjectMissingOnServer = true
+		isObjectMissing = true
 	}
 
 	log := r.log.WithValues("name", obj.GetName(), "namespace", obj.GetNamespace())
 
 	var actionName string
 	var actionFunction func(context.Context, client.Object) (time.Duration, error)
-	if isObjectMissingOnServer || obj.GetDeletionTimestamp() != nil {
+	if isObjectMissing || obj.GetDeletionTimestamp() != nil {
 		actionName = "deletion"
 		actionFunction = r.actuator.Delete
 	} else {

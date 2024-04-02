@@ -55,7 +55,7 @@ func (options *CLIOptions) AddFlags(flags *pflag.FlagSet) {
 		minSampleGapFlagName,
 		options.MinSampleGap,
 		fmt.Sprintf(
-			"How often do we adjust the level of parallelism we use for scraping pod metrics. Default: %d",
+			"If the last two metrics samples are closer in time than this, don't use them to calculate rate. Default: %d",
 			options.MinSampleGap))
 }
 

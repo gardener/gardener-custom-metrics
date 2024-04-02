@@ -508,7 +508,7 @@ func (reg *inputDataRegistry) RemoveKapiWatcher(watcher *KapiWatcher) bool {
 	return false
 }
 
-// Caller must acquire read lock before calling this function
+// Caller must acquire read lock before calling this function (or a semantic extension of a read lock - e.g. a read-write lock)
 func (reg *inputDataRegistry) notifyKapiWatchersThreadUnsafe(kapi *KapiData, event KapiEventType) {
 	for _, watcher := range reg.kapiWatchers {
 		(*watcher)(&kapiDataAdapter{x: kapi}, event)

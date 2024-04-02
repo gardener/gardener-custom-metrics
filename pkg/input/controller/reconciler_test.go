@@ -44,9 +44,9 @@ var _ = Describe("input.controller.reconciler", func() {
 	)
 
 	Describe("Reconcile", func() {
-		It("should have no effect if the object is missing", func() {
+		It("should delegate to the actuator's delete function if the object is missing", func() {
 			// Arrange
-			reconciler, _, client, _ := newTestReconciler()
+			reconciler, actuator, client, _ := newTestReconciler()
 			client.GetFunc = func(_ context.Context, key kclient.ObjectKey, _ kclient.Object) error {
 				return errors.NewNotFound(schema.GroupResource{}, key.Name)
 			}
@@ -59,6 +59,7 @@ var _ = Describe("input.controller.reconciler", func() {
 			// Assert
 			Expect(err).To(Succeed())
 			Expect(result.Requeue).To(BeFalse())
+			Expect(int(actuator.CallType)).To(Equal(callTypeDelete))
 		})
 		It("should use a deep copy of the client's prototype objet, not the prototype itself", func() {
 			// Arrange
