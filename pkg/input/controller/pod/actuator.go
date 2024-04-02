@@ -88,7 +88,7 @@ func (a *actuator) Delete(_ context.Context, obj client.Object) (requeueAfter ti
 	}
 
 	if !a.dataRegistry.RemoveKapiData(pod.Namespace, pod.Name) {
-		log.Error(nil, "Controller was notified about deletion of a pod it was not currently tracking")
+		log.V(app.VerbosityInfo).Info("Controller was notified about deletion of a pod it was not currently tracking")
 	}
 
 	return 0, nil
