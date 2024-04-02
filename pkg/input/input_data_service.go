@@ -95,6 +95,9 @@ func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
 	}
 
 	ids.log.V(app.VerbosityVerbose).Info("Adding controllers to manager")
+	ids.config.PodController.Apply(&podctl.DefaultAddOptions.Controller)
+	ids.config.SecretController.Apply(&secretctl.DefaultAddOptions.Controller)
+
 	if err := podctl.AddToManager(manager, ids.inputDataRegistry, ids.log.V(1)); err != nil {
 		return fmt.Errorf("add pod controller to manager: %w", err)
 	}
