@@ -65,7 +65,8 @@ func NewHAService(
 
 func (ha *HAService) setEndpoints(ctx context.Context) error {
 	endpoints := corev1.Endpoints{}
-	err := ha.manager.GetClient().Get(ctx, client.ObjectKey{Namespace: ha.namespace, Name: app.Name}, &endpoints)
+	// Bypass client cache to avoid triggering a cluster wide list-watch for Endpoints - our RBAC does not allow it
+	err := ha.manager.GetAPIReader().Get(ctx, client.ObjectKey{Namespace: ha.namespace, Name: app.Name}, &endpoints)
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return fmt.Errorf("updating the service endpoint to point to the new leader: retrieving endpoints: %w", err)
