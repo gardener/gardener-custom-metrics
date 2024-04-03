@@ -66,7 +66,7 @@ func (f *FakeManager) GetRESTMapper() meta.RESTMapper {
 }
 
 func (f *FakeManager) GetAPIReader() client.Reader {
-	panic("implement me")
+	return f.Client
 }
 
 // GetRunnables returns the subset of FakeManagers' runnables, which are assertable to the specified type
