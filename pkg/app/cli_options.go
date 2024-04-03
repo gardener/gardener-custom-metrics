@@ -9,6 +9,11 @@ import (
 	"time"
 
 	"github.com/spf13/pflag"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
+	"k8s.io/apimachinery/pkg/util/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	gutil "github.com/gardener/gardener-custom-metrics/pkg/util/gardener"
@@ -140,19 +145,23 @@ func (c *CLIConfig) ManagerOptions() manager.Options {
 	var opts manager.Options
 	c.Apply(&opts)
 
-	// TODO: Andrey: P2: Enable after switching from prometheus' secret (which does not have 'name' label), to ours.
-	// It will prevent retrieving and caching unnecessary secrets.
-	//
-	// nameRequirement, _ := labels.NewRequirement("name", selection.In, []string{"ca", "shoot-access-gardener-custom-metrics"})
-	// selector := labels.NewSelector().Add(*nameRequirement)
-	// opts.NewCache = cache.BuilderWithOptions(cache.Options{
-	// 	SelectorsByObject: cache.SelectorsByObject{
-	// 		&corev1.Secret{}: {
-	// 			// Field: fields.SelectorFromSet(fields.Set{"metadata.name": "ca"}),
-	// 			Label: selector,
-	// 		},
-	// 	},
-	// })
+	nameRequirement, err := labels.NewRequirement("name", selection.In, []string{"ca", "shoot-access-gardener-custom-metrics"})
+	runtime.Must(err)
+	secretsLabelSelector := labels.NewSelector().Add(*nameRequirement)
+
+	opts.NewCache = cache.BuilderWithOptions(cache.Options{
+		SelectorsByObject: cache.SelectorsByObject{
+			&corev1.Secret{}: {
+				Label: secretsLabelSelector,
+			},
+			&corev1.Pod{}: {
+				Label: labels.SelectorFromSet(map[string]string{
+					"app":  "kubernetes",
+					"role": "apiserver",
+				}),
+			},
+		},
+	})
 
 	return opts
 }
