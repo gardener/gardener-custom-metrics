@@ -7,6 +7,9 @@ package ha
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
+	"time"
+
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -14,8 +17,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kclient "sigs.k8s.io/controller-runtime/pkg/client"
-	"sync/atomic"
-	"time"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
 	"github.com/gardener/gardener-custom-metrics/pkg/util/testutil"
