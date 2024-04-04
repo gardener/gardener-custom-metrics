@@ -44,26 +44,11 @@ spec:
                   fieldPath: metadata.namespace
           image: europe-docker.pkg.dev/gardener-project/releases/gardener/gardener-custom-metrics:v0.1.0-dev
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /livez
-              port: https
-              scheme: HTTPS
-            initialDelaySeconds: 10
-            periodSeconds: 10
           name: gardener-custom-metrics
           ports:
             - containerPort: 6443
-              name: https
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /readyz
-              port: https
-              scheme: HTTPS
-            initialDelaySeconds: 10
-            periodSeconds: 10
+              name: metrics-server
+              protocol: TCP
           resources:
             requests:
               cpu: 80m
