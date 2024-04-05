@@ -4,115 +4,98 @@ metadata:
   name: gardener-custom-metrics
   namespace: garden
 automountServiceAccountToken: true
-
---- # Role: endpoint-editor
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: gardener-custom-metrics
+  namespace: garden
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  resourceNames:
+  - gardener-custom-metrics
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+- apiGroups:
+  - coordination.k8s.io
+  resourceNames:
+  - gardener-custom-metrics-leader-election
+  resources:
+  - leases
+  verbs:
+  - get
+  - watch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gardener-custom-metrics
+  namespace: garden
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: gardener-custom-metrics
+subjects:
+- kind: ServiceAccount
+  name: gardener-custom-metrics
+  namespace: garden
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: gardener-custom-metrics-endpoint-editor
+  name: gardener-custom-metrics
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - endpoints
-    # resourceNames: [ "gardener-custom-metrics" ] # TODO: Andrey: P1: How to write code so we can use name-based restriction?
-    verbs: ["*"]
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: gardener-custom-metrics--endpoint-editor
+  name: gardener-custom-metrics
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: gardener-custom-metrics-endpoint-editor
+  name: gardener-custom-metrics
 subjects:
-  - kind: ServiceAccount
-    name: gardener-custom-metrics
-    namespace: garden
-
---- # Role: custom-metrics-editor
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRole
-    metadata:
-      name: gardener-custom-metrics-custom-metrics-editor
-    rules:
-      - apiGroups:
-          - custom.metrics.k8s.io
-        resources: ["*"]
-        verbs: ["*"]
+- kind: ServiceAccount
+  name: gardener-custom-metrics
+  namespace: garden
+# Bindings to externally defined roles
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: gardener-custom-metrics--custom-metrics-editor
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: gardener-custom-metrics-custom-metrics-editor
-subjects:
-  - kind: ServiceAccount
-    name: gardener-custom-metrics
-    namespace: garden
-
---- # Role: pod-reader
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: gardener-custom-metrics-pod-reader
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - get
-      - list
-      - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: gardener-custom-metrics--pod-reader
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: gardener-custom-metrics-pod-reader
-subjects:
-  - kind: ServiceAccount
-    name: gardener-custom-metrics
-    namespace: garden
-
---- # Role: secret-reader
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: gardener-custom-metrics-secret-reader
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    # resourceNames: [ "ca", "shoot-access-gardener-custom-metrics" ] # TODO: Andrey: P1: How to write code so we can use name-based restriction?
-    verbs:
-      - get
-      - list
-      - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: gardener-custom-metrics--secret-reader
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: gardener-custom-metrics-secret-reader
-subjects:
-  - kind: ServiceAccount
-    name: gardener-custom-metrics
-    namespace: garden
-
---- # Bindings to externally defined roles ####################################
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -122,9 +105,9 @@ roleRef:
   kind: ClusterRole
   name: system:auth-delegator
 subjects:
-  - kind: ServiceAccount
-    name: gardener-custom-metrics
-    namespace: garden
+- kind: ServiceAccount
+  name: gardener-custom-metrics
+  namespace: garden
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -136,6 +119,6 @@ roleRef:
   kind: Role
   name: extension-apiserver-authentication-reader
 subjects:
-  - kind: ServiceAccount
-    name: gardener-custom-metrics
-    namespace: garden
+- kind: ServiceAccount
+  name: gardener-custom-metrics
+  namespace: garden
