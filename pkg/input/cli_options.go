@@ -25,6 +25,11 @@ type CLIOptions struct {
 	ScrapePeriod            time.Duration
 	ScrapeFlowControlPeriod time.Duration
 	MinSampleGap            time.Duration
+
+	// PodController contains Pod controller options.
+	PodController *ControllerOptions
+	// SecretController contains Secret controller options.
+	SecretController *ControllerOptions
 }
 
 // NewCLIOptions creates a CLIOptions object with default values
@@ -33,6 +38,12 @@ func NewCLIOptions() *CLIOptions {
 		ScrapePeriod:            60 * time.Second,
 		ScrapeFlowControlPeriod: 200 * time.Millisecond,
 		MinSampleGap:            10 * time.Second,
+		PodController: &ControllerOptions{
+			MaxConcurrentReconciles: 10,
+		},
+		SecretController: &ControllerOptions{
+			MaxConcurrentReconciles: 10,
+		},
 	}
 }
 
@@ -57,15 +68,28 @@ func (options *CLIOptions) AddFlags(flags *pflag.FlagSet) {
 		fmt.Sprintf(
 			"If the last two metrics samples are closer in time than this, don't use them to calculate rate. Default: %d",
 			options.MinSampleGap))
+
+	options.PodController.AddFlags(flags, "pod-")
+	options.SecretController.AddFlags(flags, "secret-")
 }
 
 // Complete implements [github.com/gardener/gardener/extensions/pkg/controller/cmd.Completer.Complete].
 func (options *CLIOptions) Complete() error {
+	if err := options.PodController.Complete(); err != nil {
+		return fmt.Errorf("failed to complete pod controller options: %w", err)
+	}
+	if err := options.SecretController.Complete(); err != nil {
+		return fmt.Errorf("failed to complete secret controller options: %w", err)
+	}
+
 	options.config = &CLIConfig{
 		ScrapePeriod:            options.ScrapePeriod,
 		ScrapeFlowControlPeriod: options.ScrapeFlowControlPeriod,
 		MinSampleGap:            options.MinSampleGap,
+		PodController:           options.PodController.Completed(),
+		SecretController:        options.SecretController.Completed(),
 	}
+
 	return nil
 }
 
@@ -84,4 +108,9 @@ type CLIConfig struct {
 	// differential (rate) calculation accuracy, and are not used as a pair (each may still be used, paired with other
 	// samples).
 	MinSampleGap time.Duration
+
+	// PodController contains Pod controller configuration.
+	PodController *ControllerConfig
+	// SecretController contains Secret controller configuration.
+	SecretController *ControllerConfig
 }

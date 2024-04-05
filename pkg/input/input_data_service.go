@@ -10,8 +10,11 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"golang.org/x/time/rate"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/util/workqueue"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	kmgr "sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
@@ -95,10 +98,27 @@ func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
 	}
 
 	ids.log.V(app.VerbosityVerbose).Info("Adding controllers to manager")
-	if err := podctl.AddToManager(manager, ids.inputDataRegistry, ids.log.V(1)); err != nil {
+	podControllerOptions := controller.Options{
+		RateLimiter: workqueue.NewMaxOfRateLimiter(
+			// Sacrifice some of the responsiveness provided by the default 5ms initial retry rate, to reduce waste
+			workqueue.NewItemExponentialFailureRateLimiter(1*time.Second, 10*time.Minute),
+			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(10), 100)},
+		),
+	}
+	ids.config.PodController.Apply(&podControllerOptions)
+	if err := podctl.AddToManager(manager, ids.inputDataRegistry, podControllerOptions, nil, ids.log.V(1)); err != nil {
 		return fmt.Errorf("add pod controller to manager: %w", err)
 	}
-	if err := secretctl.AddToManager(manager, ids.inputDataRegistry, ids.log.V(1)); err != nil {
+
+	secretControllerOptions := controller.Options{
+		RateLimiter: workqueue.NewMaxOfRateLimiter(
+			// Sacrifice some of the responsiveness provided by the default 5ms initial retry rate, to reduce waste
+			workqueue.NewItemExponentialFailureRateLimiter(5*time.Second, 10*time.Minute),
+			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(10), 100)},
+		),
+	}
+	ids.config.SecretController.Apply(&secretControllerOptions)
+	if err := secretctl.AddToManager(manager, ids.inputDataRegistry, secretControllerOptions, nil, ids.log.V(1)); err != nil {
 		return fmt.Errorf("add secret controller to manager: %w", err)
 	}
 
