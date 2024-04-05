@@ -76,10 +76,10 @@ func (options *CLIOptions) AddFlags(flags *pflag.FlagSet) {
 // Complete implements [github.com/gardener/gardener/extensions/pkg/controller/cmd.Completer.Complete].
 func (options *CLIOptions) Complete() error {
 	if err := options.PodController.Complete(); err != nil {
-		return err
+		return fmt.Errorf("failed to complete pod controller options: %w", err)
 	}
 	if err := options.SecretController.Complete(); err != nil {
-		return err
+		return fmt.Errorf("failed to complete secret controller options: %w", err)
 	}
 
 	options.config = &CLIConfig{
