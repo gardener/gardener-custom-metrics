@@ -49,8 +49,6 @@ gardener-custom-metrics:
           preprocess: 'finalize'
         release:
           nextversion: 'bump_minor'
-          next_version_callback: '.ci/prepare_release'
-          release_callback: '.ci/prepare_release'
 #        slack:
 #          default_channel: 'internal_scp_workspace'
 #          channel_cfgs:
