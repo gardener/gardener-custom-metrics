@@ -18,7 +18,7 @@ import (
 	"k8s.io/component-base/version"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	kmgr "sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
 	"github.com/gardener/gardener-custom-metrics/pkg/ha"
@@ -75,7 +75,7 @@ func getRootCommand() *cobra.Command {
 // completeAppCLIOptions completes initialisation based on application-level CLI options.
 // Upon error, any of the returned Logger, Manager, and HAService may be nil.
 func completeAppCLIOptions(
-	ctx context.Context, appOptions *app.CLIOptions) (*logr.Logger, kmgr.Manager, *ha.HAService, error) {
+	ctx context.Context, appOptions *app.CLIOptions) (*logr.Logger, manager.Manager, *ha.HAService, error) {
 
 	if err := appOptions.Complete(); err != nil {
 		return nil, nil, nil, fmt.Errorf("completing application level CLI options: %w", err)
@@ -91,15 +91,15 @@ func completeAppCLIOptions(
 		return &log, nil, nil, fmt.Errorf("create client set: %w", err)
 	}
 	log.V(app.VerbosityVerbose).Info("Creating controller manager")
-	manager, err := kmgr.New(appOptions.RestOptions.Completed().Config, appOptions.Completed().ManagerOptions())
+	mgr, err := manager.New(appOptions.RestOptions.Completed().Config, appOptions.Completed().ManagerOptions())
 	if err != nil {
 		return &log, nil, nil, fmt.Errorf("creating controller manager: %w", err)
 	}
 
 	// Create HA service
-	haService := ha.NewHAService(manager, appOptions.Namespace, appOptions.AccessIPAddress, appOptions.AccessPort, log)
+	haService := ha.NewHAService(mgr.GetAPIReader(), mgr.GetClient(), appOptions.Namespace, appOptions.AccessIPAddress, appOptions.AccessPort, log)
 
-	return &log, manager, haService, nil
+	return &log, mgr, haService, nil
 }
 
 // completeInputServiceCLIOptions completes initialisation based on CLI options related to input data processing.
@@ -113,20 +113,20 @@ func completeInputServiceCLIOptions(options *input.CLIOptions, log logr.Logger) 
 }
 
 // completeMetircsProviderServiceCLIOptions completes initialisation based on CLI options related to metrics serving.
-// It returns a [kmgr.Runnable] which can be executed under the supervision of a controller manager.
+// It returns a [manager.Runnable] which can be executed under the supervision of a controller manager.
 //
-// The onFailedFunc parameter is a function which will be called by the [kmgr.Runnable] if it fails.
+// The onFailedFunc parameter is a function which will be called by the [manager.Runnable] if it fails.
 func completeMetircsProviderServiceCLIOptions(
 	metricsService *metrics_provider.MetricsProviderService,
 	inputService input.InputDataService,
 	log logr.Logger,
-	onFailedFunc context.CancelFunc) (kmgr.RunnableFunc, error) {
+	onFailedFunc context.CancelFunc) (manager.RunnableFunc, error) {
 
 	if err := metricsService.CompleteCLIConfiguration(inputService.DataSource(), log); err != nil {
 		return nil, fmt.Errorf("configure metrics adapter based on command line arguments: %w", err)
 	}
 
-	var metricsProviderRunnable kmgr.RunnableFunc = func(ctx context.Context) error {
+	var metricsProviderRunnable manager.RunnableFunc = func(ctx context.Context) error {
 		if err := metricsService.Run(ctx.Done()); err != nil {
 			log.V(app.VerbosityError).Error(err, "Failed to run custom metrics adapter")
 			onFailedFunc()

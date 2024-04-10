@@ -59,7 +59,6 @@ var _ = Describe("MetricsService", func() {
 			Expect(actualMaxSampleAge).To(Equal(90 * time.Second))
 			Expect(actualMaxSampleGap).To(Equal(10 * time.Minute))
 			Expect(mps.Name).To(Equal(adapterName))
-			Expect(mps.OpenAPIConfig).NotTo(BeNil())
 		})
 	})
 })

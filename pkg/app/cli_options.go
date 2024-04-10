@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	gutil "github.com/gardener/gardener-custom-metrics/pkg/util/gardener"
@@ -149,8 +150,8 @@ func (c *CLIConfig) ManagerOptions() manager.Options {
 	runtime.Must(err)
 	secretsLabelSelector := labels.NewSelector().Add(*nameRequirement)
 
-	opts.NewCache = cache.BuilderWithOptions(cache.Options{
-		SelectorsByObject: cache.SelectorsByObject{
+	opts.Cache = cache.Options{
+		ByObject: map[client.Object]cache.ByObject{
 			&corev1.Secret{}: {
 				Label: secretsLabelSelector,
 			},
@@ -161,7 +162,7 @@ func (c *CLIConfig) ManagerOptions() manager.Options {
 				}),
 			},
 		},
-	})
+	}
 
 	return opts
 }

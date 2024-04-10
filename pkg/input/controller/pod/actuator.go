@@ -21,8 +21,7 @@ import (
 // The pod actuator acts upon kube-apiserver pods, maintaining the information necessary to scrape
 // the respective shoot kube-apiserver
 type actuator struct {
-	client client.Client
-	log    logr.Logger
+	log logr.Logger
 	// А concurrency-safe data repository. Source of various data used by the controller and also where the controller
 	// stores the data it produces.
 	dataRegistry input_data_registry.InputDataRegistry
@@ -31,12 +30,10 @@ type actuator struct {
 // NewActuator creates a new pod actuator.
 // dataRegistry: a concurrency-safe data repository, source of various data used by the controller, and also where
 // the controller stores the data it produces.
-func NewActuator(
-	client client.Client, dataRegistry input_data_registry.InputDataRegistry, log logr.Logger) gcmctl.Actuator {
+func NewActuator(dataRegistry input_data_registry.InputDataRegistry, log logr.Logger) gcmctl.Actuator {
 
 	log.V(app.VerbosityVerbose).Info("Creating actuator")
 	return &actuator{
-		client:       client,
 		dataRegistry: dataRegistry,
 		log:          log,
 	}
@@ -101,10 +98,4 @@ func toPod(obj client.Object, log logr.Logger) (*corev1.Pod, bool) {
 	}
 
 	return pod, ok
-}
-
-// InjectClient implements sigs.k8s.io/controller-runtime/pkg/runtime/inject.Client.InjectClient()
-func (a *actuator) InjectClient(client client.Client) error {
-	a.client = client
-	return nil
 }

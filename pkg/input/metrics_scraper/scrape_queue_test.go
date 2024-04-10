@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.uber.org/atomic"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/input/input_data_registry"
 	"github.com/gardener/gardener-custom-metrics/pkg/util/testutil"
@@ -98,7 +98,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 				pm.MaxRate.Store(config.MaxRate)
 				pm.RateDebtLimit.Store(int32(config.RateDebtLimit))
 				pm.RateSurplusLimit.Store(int32(config.RateSurplusLimit))
-				pm.PermissionResponse = pointer.Bool(true)
+				pm.PermissionResponse = ptr.To(true)
 				return pm
 			}
 			idr := &input_data_registry.FakeInputDataRegistry{}
@@ -334,7 +334,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			sq.testIsolation.TimeNow = testutil.NewTimeNowStub(1, 0, 0)
 			defer sq.Close()
 			addTargetScrambleQueue(nsName, podName, sq, idr)
-			pm.PermissionResponse = pointer.Bool(false)
+			pm.PermissionResponse = ptr.To(false)
 
 			// Act
 			next := sq.GetNext()
@@ -366,7 +366,7 @@ var _ = Describe("input.metrics_scraper.scrapeQueueImpl", func() {
 			addTargetScrambleQueue(nsName, podName, sq, idr)
 			sq.testIsolation.TimeNow = testutil.NewTimeNowStub(2, 0, 0)
 			initialScrapeTime := idr.GetKapiData(nsName, podName).LastMetricsScrapeTime
-			pm.PermissionResponse = pointer.Bool(false)
+			pm.PermissionResponse = ptr.To(false)
 
 			// Act
 			sq.GetNext()

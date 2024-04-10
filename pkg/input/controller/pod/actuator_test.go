@@ -16,7 +16,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/gardener/gardener-custom-metrics/pkg/input/controller/test_util"
 	"github.com/gardener/gardener-custom-metrics/pkg/input/input_data_registry"
 )
 
@@ -30,8 +29,7 @@ var _ = Describe("input.controller.pod.actuator", func() {
 	var (
 		newTestActuator = func() (*actuator, input_data_registry.InputDataRegistry) {
 			idr := input_data_registry.NewInputDataRegistry(1*time.Second, logr.Discard())
-			client := test_util.NewFakeClient()
-			actuator := NewActuator(client, idr, logr.Discard()).(*actuator)
+			actuator := NewActuator(idr, logr.Discard()).(*actuator)
 			return actuator, idr
 		}
 		newTestPod = func() *corev1.Pod {

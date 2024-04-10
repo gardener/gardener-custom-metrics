@@ -80,20 +80,9 @@ tidy:
 clean:
 	@$(REPO_ROOT)/third_party/gardener/gardener/hack/clean.sh ./cmd/... ./pkg/...
 
-.PHONY: check-generate
-check-generate:
-	echo "Code generation is currently not implemented"
-	# @$(REPO_ROOT)/third_party/gardener/gardener/hack/check-generate.sh $(REPO_ROOT)
-
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(HELM)
 	@$(REPO_ROOT)/third_party/gardener/gardener/hack/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
-
-.PHONY: generate
-generate: $(CONTROLLER_GEN) $(GEN_CRD_API_REFERENCE_DOCS) $(HELM) $(YQ)
-	echo "Code generation is currently not implemented"
-	# @$(REPO_ROOT)/third_party/gardener/gardener/hack/generate.sh ./cmd/... ./pkg/...
-	# $(MAKE) format
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
@@ -115,7 +104,7 @@ test-clean:
 verify: check format test
 
 .PHONY: verify-extended
-verify-extended: check-generate check format test-cov test-clean
+verify-extended: check format test-cov test-clean
 
 # skaffold dev and debug clean up deployed modules by default, disable this
 debug: export SKAFFOLD_CLEANUP = false

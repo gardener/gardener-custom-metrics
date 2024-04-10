@@ -15,7 +15,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
-	kmgr "sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/gardener/gardener-custom-metrics/pkg/app"
 	podctl "github.com/gardener/gardener-custom-metrics/pkg/input/controller/pod"
@@ -50,7 +50,7 @@ type InputDataService interface {
 	// DataSource returns an interface for consuming metrics provided by the InputDataService
 	DataSource() input_data_registry.InputDataSource
 	// AddToManager adds all of InputDataService's underlying data gathering activities to the specified manager.
-	AddToManager(manager kmgr.Manager) error
+	AddToManager(mgr manager.Manager) error
 }
 
 type inputDataService struct {
@@ -83,7 +83,7 @@ func (ids *inputDataService) DataSource() input_data_registry.InputDataSource {
 	return ids.inputDataRegistry.DataSource()
 }
 
-func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
+func (ids *inputDataService) AddToManager(mgr manager.Manager) error {
 	ids.log.V(app.VerbosityInfo).Info("Creating scraper")
 	scraper := ids.testIsolation.NewScraper(
 		ids.inputDataRegistry,
@@ -93,7 +93,7 @@ func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
 
 	ids.log.V(app.VerbosityVerbose).Info("Updating manager schemes")
 	builder := runtime.NewSchemeBuilder(scheme.AddToScheme)
-	if err := builder.AddToScheme(manager.GetScheme()); err != nil {
+	if err := builder.AddToScheme(mgr.GetScheme()); err != nil {
 		return fmt.Errorf("add input data service scheme to manager: %w", err)
 	}
 
@@ -106,7 +106,7 @@ func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
 		),
 	}
 	ids.config.PodController.Apply(&podControllerOptions)
-	if err := podctl.AddToManager(manager, ids.inputDataRegistry, podControllerOptions, nil, ids.log.V(1)); err != nil {
+	if err := podctl.AddToManager(mgr, ids.inputDataRegistry, podControllerOptions, ids.log.V(1)); err != nil {
 		return fmt.Errorf("add pod controller to manager: %w", err)
 	}
 
@@ -118,12 +118,12 @@ func (ids *inputDataService) AddToManager(manager kmgr.Manager) error {
 		),
 	}
 	ids.config.SecretController.Apply(&secretControllerOptions)
-	if err := secretctl.AddToManager(manager, ids.inputDataRegistry, secretControllerOptions, nil, ids.log.V(1)); err != nil {
+	if err := secretctl.AddToManager(mgr, ids.inputDataRegistry, secretControllerOptions, ids.log.V(1)); err != nil {
 		return fmt.Errorf("add secret controller to manager: %w", err)
 	}
 
 	ids.log.V(app.VerbosityVerbose).Info("Adding scraper to manager")
-	if err := manager.Add(scraper); err != nil {
+	if err := mgr.Add(scraper); err != nil {
 		return fmt.Errorf("add scraper to controller manager: %w", err)
 	}
 
